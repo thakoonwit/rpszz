@@ -20,9 +20,9 @@
 
 .loginTitle {
   font-family: var(--font-display);
-  font-size: 48px;
+  font-size: clamp(2rem, 10vw, 4.5rem); /* Capped display heading size */
   color: var(--white);
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
 }
 
 .loginSub {
@@ -72,8 +72,8 @@
 
 .pageTitle {
   font-family: var(--font-display);
-  font-size: 40px;
-  letter-spacing: 0.06em;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  letter-spacing: 0.04em;
   color: var(--white);
 }
 

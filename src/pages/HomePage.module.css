@@ -22,11 +22,12 @@
 
 .heroTitle {
   font-family: var(--font-display);
-  font-size: clamp(64px, 12vw, 130px);
-  line-height: 0.85;
+  font-size: clamp(3rem, 10vw, 6rem); /* capped at 6rem per brand register guidelines */
+  line-height: 0.9;
   color: var(--ink);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em; /* tight display spacing, above floor -0.04em */
   margin-bottom: 24px;
+  text-transform: uppercase;
 }
 
 .heroShop {
@@ -235,8 +236,8 @@
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-size: 44px;
-  letter-spacing: 0.02em;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  letter-spacing: -0.02em;
   color: var(--ink);
   margin-bottom: 40px;
   line-height: 1.1;

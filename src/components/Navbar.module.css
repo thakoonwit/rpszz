@@ -1,8 +1,8 @@
 .nav {
   position: sticky;
   top: 0;
-  z-index: 100;
-  background: rgba(10, 15, 30, 0.9);
+  z-index: 1100; /* aligned with standard stacking rules */
+  background: oklch(0.10 0.015 262 / 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }

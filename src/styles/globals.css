@@ -20,6 +20,14 @@
 
   --font-display: 'Bricolage Grotesque', sans-serif;
   --font-body: 'Chakra Petch', sans-serif;
+
+  /* Let's define the alias tokens for backward compatibility */
+  --white: var(--ink);
+  --white-muted: var(--muted);
+  --red: var(--accent);
+  --red-dark: var(--accent-dark);
+  --navy-2: var(--surface);
+  --navy-3: var(--bg);
 }
 
 html {
