@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -19,8 +19,8 @@
   --accent-dark: oklch(0.42 0.22 20);
 
   /* Clean minimal typography - single font family */
-  --font-display: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
-  --font-body: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
 
   /* Sizing and visual helpers */
   --radius-sm: 6px;

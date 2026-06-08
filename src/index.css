@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   /* Minimalist light theme inspired by uwaver */
@@ -15,8 +15,8 @@
   --accent-muted: oklch(0.95 0.05 20);
   
   /* Typography */
-  --font-sans: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
-  --font-display: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
 
   /* Spacing */
   --space-2xs: clamp(0.25rem, 0.23rem + 0.11vw, 0.38rem);
