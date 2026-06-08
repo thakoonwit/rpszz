@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import toast, { Toaster } from 'react-hot-toast'
 import styles from './AdminPage.module.css'
-import { useConvex } from 'convex/react'
+import { useConvex, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 const EMPTY_FORM = {
@@ -42,6 +42,8 @@ export default function AdminDashboard() {
   const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD || 'rpszz2025'
   const hasConvex = !!import.meta.env.VITE_CONVEX_URL
   const convex = useConvex()
+  const generateUploadUrl = useMutation(api.products.generateUploadUrl)
+  const getImageUrl = useMutation(api.products.getImageUrl) // Retrieve URL mutation
 
   async function handleImageUpload(e) {
     const files = Array.from(e.target.files)
@@ -51,28 +53,40 @@ export default function AdminDashboard() {
     const uploadedUrls = []
 
     for (const file of files) {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`
-      const filePath = `product-images/${fileName}`
-
       try {
-        const { data, error } = await supabase.storage
-          .from('products')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          })
+        if (usingFallback || !hasConvex) {
+          // If in offline fallback mode, generate a local Blob Object URL so previewing still functions
+          const localUrl = URL.createObjectURL(file)
+          uploadedUrls.push(localUrl)
+          continue
+        }
 
-        if (error) throw error
+        // 1. Generate Convex Upload URL endpoint
+        const uploadUrl = await generateUploadUrl()
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('products')
-          .getPublicUrl(filePath)
+        // 2. POST file directly to Convex storage
+        const result = await fetch(uploadUrl, {
+          method: "POST",
+          headers: { "Content-Type": file.type },
+          body: file,
+        })
 
-        uploadedUrls.push(publicUrl)
+        if (!result.ok) {
+          throw new Error(`Convex storage upload failed with status ${result.status}`)
+        }
+
+        const { storageId } = await result.json()
+
+        // 3. Get public download URL from Convex HTTP storage
+        const publicUrl = await convex.query(api.products.getImageUrl, { storageId })
+        if (publicUrl) {
+          uploadedUrls.push(publicUrl)
+        } else {
+          throw new Error('Could not retrieve public URL for storage ID')
+        }
       } catch (err) {
         console.error('Error uploading file:', err)
-        toast.error(`อัปเดตปุ่มรูป ${file.name} ล้มเหลว: ${err.message || 'โปรดตรวจสอบ Storage Bucket "products" ใน Supabase Console'}`)
+        toast.error(`อัปเดตปุ่มรูป ${file.name} ล้มเหลว: ${err.message || 'โปรดตรวจสอบสิทธิ์การใช้งาน Storage ใน Convex Console'}`)
       }
     }
 
