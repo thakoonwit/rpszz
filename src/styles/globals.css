@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800;12..96,900&family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -7,19 +7,29 @@
 }
 
 :root {
-  /* OKLCH Design Tokens from DESIGN.md - Clean White / Light Theme */
-  --bg: oklch(0.99 0.002 262);           /* Pure crisp white background */
-  --surface: oklch(0.97 0.005 262);      /* Surface color for cards and panels */
-  --border: oklch(0.90 0.01 262);        /* Sharp clean 1px borders */
-  --ink: oklch(0.12 0.015 262);          /* High-contrast near-black text */
-  --muted: oklch(0.45 0.015 262);        /* Dimmed text color for descriptions */
-  --primary: oklch(0.55 0.18 262.4);     /* Deep cobalt electric blue */
-  --primary-dim: oklch(0.55 0.18 262.4 / 0.1);
-  --accent: oklch(0.58 0.22 25);         /* Vibrant deep red street accent */
-  --accent-dark: oklch(0.48 0.22 25);
+  /* OKLCH Design Tokens - Clean White / Light Theme inspired by uwaver */
+  --bg: oklch(1.00 0.00 0);               /* Pure white background */
+  --surface: oklch(0.985 0.003 258);      /* Sleek light surface */
+  --border: oklch(0.95 0.005 258);        /* Soft subtle border lines */
+  --ink: oklch(0.12 0.015 258);          /* High-contrast ink text */
+  --muted: oklch(0.48 0.015 258);        /* Medium slate grey */
+  --primary: oklch(0.45 0.20 258);       /* uwaver premium cobalt blue */
+  --primary-dim: oklch(0.45 0.20 258 / 0.08);
+  --accent: oklch(0.52 0.22 20);         /* Refined warm red street accent */
+  --accent-dark: oklch(0.42 0.22 20);
 
-  --font-display: 'Bricolage Grotesque', sans-serif;
-  --font-body: 'Chakra Petch', sans-serif;
+  /* Clean minimal typography - single font family */
+  --font-display: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
+  --font-body: 'IBM Plex Sans Thai', system-ui, -apple-system, sans-serif;
+
+  /* Sizing and visual helpers */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.02);
+  --shadow-hover: 0 4px 12px rgba(0,0,0,0.04), 0 12px 28px rgba(0,0,0,0.05);
 
   /* Alias tokens for backward compatibility */
   --white: var(--ink);

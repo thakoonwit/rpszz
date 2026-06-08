@@ -1,17 +1,19 @@
 .nav {
   position: sticky;
   top: 0;
-  z-index: 1100; /* aligned with standard stacking rules */
-  background: oklch(0.10 0.015 262 / 0.85);
-  backdrop-filter: blur(12px);
+  z-index: 1100;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
+  transition: all 0.3s ease;
 }
 
 .inner {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,63 +21,66 @@
 
 .logo {
   font-family: var(--font-display);
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   color: var(--ink);
   line-height: 1;
 }
 
 .logoImg {
-  height: 40px;
+  height: 34px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px var(--primary-dim));
 }
 
 .logoText {
   display: flex;
   align-items: center;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .logoR {
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .links {
   display: flex;
   align-items: center;
-  gap: 40px;
+  gap: 8px;
 }
 
 .links a {
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
-  letter-spacing: 0.04em;
-  transition: color 0.2s;
-  text-transform: uppercase;
+  letter-spacing: 0em;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-transform: none;
 }
 
 .links a:hover,
 .links a.active {
-  color: var(--ink);
+  color: var(--primary);
+  background-color: var(--primary-dim);
 }
 
 .ctaLink {
-  padding: 8px 20px !important;
-  background: var(--accent) !important;
-  color: oklch(0.99 0.002 262) !important; /* light text on red button */
-  border-radius: 2px;
+  padding: 9px 20px !important;
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-radius: 10px !important;
   font-weight: 600 !important;
-  letter-spacing: 0.06em;
-  transition: background 0.2s !important;
+  letter-spacing: 0em;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px oklch(0.45 0.20 258 / 0.15) !important;
 }
 
 .ctaLink:hover {
-  background: var(--accent-dark) !important;
-  color: oklch(0.99 0.002 262) !important;
+  background: oklch(0.38 0.15 258) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px oklch(0.38 0.15 258 / 0.25) !important;
 }
 
 .burger {
@@ -99,14 +104,14 @@
   .links {
     display: none;
     position: absolute;
-    top: 64px;
+    top: 70px;
     left: 0;
     right: 0;
-    background: var(--surface);
+    background: #ffffff;
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 24px;
-    gap: 24px;
+    gap: 16px;
     align-items: flex-start;
   }
 

@@ -1,51 +1,52 @@
 .page {
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 70px);
   padding: 100px 0;
+  background-color: #ffffff;
 }
 
 .header {
-  margin-bottom: 56px;
+  margin-bottom: 48px;
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(3rem, 8vw, 6rem); /* capped at 6rem per brand register guidelines */
-  line-height: 0.95;
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.2;
   color: var(--ink);
   letter-spacing: -0.02em;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  font-weight: 700;
 }
 
 .title span {
-  color: var(--accent);
+  color: var(--primary);
 }
 
 .sub {
   font-size: 15px;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .form {
-  margin-bottom: 56px;
+  margin-bottom: 48px;
 }
 
 .inputGroup {
   display: flex;
-  gap: 0;
-  max-width: 500px;
+  gap: 8px;
+  max-width: 480px;
 }
 
 .input {
   flex: 1;
-  padding: 16px 24px;
+  padding: 14px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-right: none;
-  border-radius: 2px 0 0 2px;
+  border-radius: 12px;
   color: var(--ink);
-  font-size: 16px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-size: 15px;
+  transition: all 0.2s ease;
 }
 
 .input::placeholder {
@@ -55,25 +56,28 @@
 .input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 8px var(--primary-dim);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px var(--primary-dim);
 }
 
 .searchBtn {
-  padding: 16px 36px;
-  background: var(--accent);
-  color: var(--ink);
+  padding: 14px 32px;
+  background: var(--primary);
+  color: #ffffff;
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  border-radius: 0 2px 2px 0;
-  transition: background 0.2s, box-shadow 0.2s;
+  font-weight: 600;
+  letter-spacing: 0em;
+  text-transform: none;
+  border-radius: 12px;
+  transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 8px oklch(0.45 0.20 258 / 0.15);
 }
 
 .searchBtn:hover:not(:disabled) {
-  background: var(--accent-dark);
-  box-shadow: 0 0 12px oklch(0.58 0.22 25 / 0.3);
+  background: oklch(0.38 0.15 258);
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 16px oklch(0.38 0.15 258 / 0.25);
 }
 
 .searchBtn:disabled {
@@ -90,28 +94,30 @@
 .resultMeta {
   font-size: 13px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0em;
+  font-weight: 500;
 }
 
 .orderList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   max-width: 680px;
 }
 
 .orderCard {
-  background: var(--surface);
+  background: #ffffff;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  transition: border-color 0.2s;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
 .orderCard:hover {
   border-color: var(--primary);
+  box-shadow: var(--shadow-hover);
 }
 
 .orderTop {
@@ -122,10 +128,10 @@
 }
 
 .thumb {
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   object-fit: cover;
-  border-radius: 2px;
+  border-radius: 10px;
   flex-shrink: 0;
   border: 1px solid var(--border);
 }
@@ -136,69 +142,70 @@
 }
 
 .productName {
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   color: var(--ink);
   margin-bottom: 6px;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .orderDate {
   font-size: 13px;
   color: var(--muted);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .note {
   font-size: 13px;
   color: var(--muted);
   margin-top: 8px;
-  font-style: italic;
+  font-style: normal;
 }
 
 .statusWrap {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   gap: 6px;
   flex-shrink: 0;
 }
 
 .statusIcon {
-  font-size: 28px;
+  font-size: 20px;
   line-height: 1;
 }
 
 .statusLabel {
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0em;
+  text-transform: none;
   white-space: nowrap;
 }
 
 .orderBottom {
   padding: 16px 24px;
   border-top: 1px solid var(--border);
-  background: var(--bg);
+  background: var(--surface);
 }
 
 .priceTag {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--ink);
 }
 
 .empty {
-  padding: 64px 0;
+  padding: 48px 0;
   max-width: 450px;
 }
 
 .empty p {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 600;
   color: var(--ink);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .empty span {
@@ -212,7 +219,7 @@
   gap: 20px;
   padding: 24px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
   max-width: 480px;
 }
@@ -229,12 +236,14 @@
   background: #06c755;
   color: #fff;
   font-size: 13px;
-  font-weight: 700;
-  border-radius: 2px;
+  font-weight: 600;
+  border-radius: 8px;
   white-space: nowrap;
   transition: opacity 0.2s;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0em;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .lineBtn:hover {
