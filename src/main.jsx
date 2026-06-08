@@ -4,13 +4,11 @@ import App from './App'
 import './styles/globals.css'
 import { ConvexProvider, ConvexReactClient } from "convex/react"
 
-const convexUrl = import.meta.env.VITE_CONVEX_URL || ""
-const convex = convexUrl ? new ConvexReactClient(convexUrl) : null
+// Always initialize ConvexReactClient with a fallback URL to prevent context crash
+const convexUrl = import.meta.env.VITE_CONVEX_URL || "https://placeholder.convex.cloud"
+const convex = new ConvexReactClient(convexUrl)
 
 function Root() {
-  if (!convex) {
-    return <App />
-  }
   return (
     <ConvexProvider client={convex}>
       <App />
