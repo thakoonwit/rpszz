@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import toast, { Toaster } from 'react-hot-toast'
 import styles from './AdminPage.module.css'
+import { useConvex } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 const EMPTY_FORM = {
   name: '', description: '', price: '', category: 'clothing',
@@ -38,6 +40,8 @@ export default function AdminDashboard() {
   const [uploading, setUploading] = useState(false)
 
   const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD || 'rpszz2025'
+  const hasConvex = !!import.meta.env.VITE_CONVEX_URL
+  const convex = useConvex()
 
   async function handleImageUpload(e) {
     const files = Array.from(e.target.files)
@@ -102,6 +106,15 @@ export default function AdminDashboard() {
 
   async function fetchAll() {
     try {
+      if (hasConvex && convex) {
+        const p = await convex.query(api.products.list)
+        const o = await convex.query(api.orders.list)
+        setProducts(p.map(x => ({ ...x, id: x._id })))
+        setOrders(o.map(x => ({ ...x, id: x._id, product: x.product ? { ...x.product, id: x.product._id } : null })))
+        setUsingFallback(false)
+        return
+      }
+
       const [{ data: p, error: pError }, { data: o, error: oError }] = await Promise.all([
         supabase.from('products').select('*').order('created_at', { ascending: false }),
         supabase.from('orders').select('*, products(*)').order('created_at', { ascending: false }),
@@ -161,6 +174,24 @@ export default function AdminDashboard() {
       setForm(EMPTY_FORM)
       setEditing(null)
       fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        if (editing) {
+          await convex.mutation(api.products.update, { id: editing, ...payload })
+          toast.success('อัปเดตสำเร็จ')
+          setEditing(null)
+          setForm(EMPTY_FORM)
+          setTab('products')
+        } else {
+          await convex.mutation(api.products.add, payload)
+          toast.success('เพิ่มสินค้าสำเร็จ')
+          setForm(EMPTY_FORM)
+          setTab('products')
+        }
+        fetchAll()
+      } catch (err) {
+        toast.error('ไม่สำเร็จ: ' + err.message)
+      }
     } else {
       if (editing) {
         const { error } = await supabase.from('products').update(payload).eq('id', editing)
@@ -191,10 +222,10 @@ export default function AdminDashboard() {
     const payload = {
       customer_name: orderForm.customer_name,
       customer_phone: orderForm.customer_phone,
-      product_id: orderForm.product_id || null,
+      product_id: orderForm.product_id || undefined,
       status: orderForm.status,
-      tracking_number: orderForm.tracking_number || null,
-      note: orderForm.note || null,
+      tracking_number: orderForm.tracking_number || undefined,
+      note: orderForm.note || undefined,
     }
 
     if (usingFallback) {
@@ -222,6 +253,24 @@ export default function AdminDashboard() {
       setOrderForm(EMPTY_ORDER_FORM)
       setEditingOrder(null)
       fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        if (editingOrder) {
+          await convex.mutation(api.orders.update, { id: editingOrder, ...payload })
+          toast.success('อัปเดตคำสั่งซื้อสำเร็จ')
+          setEditingOrder(null)
+          setOrderForm(EMPTY_ORDER_FORM)
+          setTab('orders')
+        } else {
+          await convex.mutation(api.orders.add, payload)
+          toast.success('เพิ่มคำสั่งซื้อสำเร็จ')
+          setOrderForm(EMPTY_ORDER_FORM)
+          setTab('orders')
+        }
+        fetchAll()
+      } catch (err) {
+        toast.error('ไม่สำเร็จ: ' + err.message)
+      }
     } else {
       if (editingOrder) {
         const { error } = await supabase.from('orders').update(payload).eq('id', editingOrder)
@@ -254,6 +303,14 @@ export default function AdminDashboard() {
       localStorage.setItem('rpszz_local_products', JSON.stringify(filtered))
       toast.success('ลบแล้ว')
       fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        await convex.mutation(api.products.deleteProduct, { id })
+        toast.success('ลบแล้ว')
+        fetchAll()
+      } catch (err) {
+        toast.error('ลบไม่สำเร็จ: ' + err.message)
+      }
     } else {
       const { error } = await supabase.from('products').delete().eq('id', id)
       if (error) toast.error('ลบไม่สำเร็จ: ' + error.message)
@@ -272,6 +329,14 @@ export default function AdminDashboard() {
       localStorage.setItem('rpszz_local_orders', JSON.stringify(filtered))
       toast.success('ลบคำสั่งซื้อแล้ว')
       fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        await convex.mutation(api.orders.deleteOrder, { id })
+        toast.success('ลบคำสั่งซื้อแล้ว')
+        fetchAll()
+      } catch (err) {
+        toast.error('ลบไม่สำเร็จ: ' + err.message)
+      }
     } else {
       const { error } = await supabase.from('orders').delete().eq('id', id)
       if (error) toast.error('ลบไม่สำเร็จ: ' + error.message)
@@ -289,6 +354,24 @@ export default function AdminDashboard() {
       localStorage.setItem('rpszz_local_products', JSON.stringify(localProds))
       toast.success(`เปลี่ยนเป็น: ${status}`)
       fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        const prod = products.find(p => p.id === id)
+        await convex.mutation(api.products.update, {
+          id,
+          name: prod.name || prod.title,
+          title: prod.title || prod.name,
+          price: prod.price,
+          category: prod.category,
+          image_url: prod.image_url,
+          description: prod.description,
+          status
+        })
+        toast.success(`เปลี่ยนเป็น: ${status}`)
+        fetchAll()
+      } catch (err) {
+        toast.error('เปลี่ยนไม่สำเร็จ: ' + err.message)
+      }
     } else {
       const { error } = await supabase.from('products').update({ status }).eq('id', id)
       if (error) toast.error('เปลี่ยนไม่สำเร็จ: ' + error.message)
@@ -306,6 +389,23 @@ export default function AdminDashboard() {
       localStorage.setItem('rpszz_local_orders', JSON.stringify(localOrders))
       toast.success('อัปเดตสถานะสำเร็จ')
       fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        const o = orders.find(x => x.id === id)
+        await convex.mutation(api.orders.update, {
+          id,
+          customer_name: o.customer_name,
+          customer_phone: o.customer_phone,
+          product_id: o.product_id,
+          tracking_number: o.tracking_number,
+          note: o.note,
+          status
+        })
+        toast.success('อัปเดตสถานะสำเร็จ')
+        fetchAll()
+      } catch (err) {
+        toast.error('อัปเดตไม่สำเร็จ: ' + err.message)
+      }
     } else {
       const { error } = await supabase.from('orders').update({ status }).eq('id', id)
       if (error) toast.error('อัปเดตไม่สำเร็จ: ' + error.message)

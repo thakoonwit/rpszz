@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import styles from './TrackPage.module.css'
+import { useConvex } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 const STATUS_MAP = {
   preparing: { label: 'กำลังเตรียมสินค้า', color: '#fbbf24', icon: '○' },
@@ -46,6 +48,9 @@ export default function StatusCheck() {
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
 
+  const hasConvex = !!import.meta.env.VITE_CONVEX_URL
+  const convex = useConvex()
+
   async function handleSearch(e) {
     e.preventDefault()
     if (!phone.trim()) return
@@ -55,18 +60,23 @@ export default function StatusCheck() {
     const clean = phone.trim()
 
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*, products(*)')
-        .eq('customer_phone', clean)
-        .order('created_at', { ascending: false })
-
-      if (error || !data || data.length === 0) {
-        // Fallback checks
-        const matched = MOCK_ORDERS.filter(o => o.customer_phone === clean)
-        setResults(matched)
+      if (hasConvex && convex) {
+        const data = await convex.query(api.orders.getByPhone, { phone: clean })
+        setResults(data.map(o => ({ ...o, id: o._id })))
       } else {
-        setResults(data)
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*, products(*)')
+          .eq('customer_phone', clean)
+          .order('created_at', { ascending: false })
+
+        if (error || !data || data.length === 0) {
+          // Fallback checks
+          const matched = MOCK_ORDERS.filter(o => o.customer_phone === clean)
+          setResults(matched)
+        } else {
+          setResults(data)
+        }
       }
     } catch (err) {
       console.error('Error searching order:', err)

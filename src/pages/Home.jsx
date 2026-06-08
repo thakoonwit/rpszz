@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import ProductCard from '../components/ProductCard.jsx'
 import styles from './HomePage.module.css'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 
 const FILTERS = ['ทั้งหมด', 'available', 'reserved', 'sold']
 const FILTER_LABELS = {
@@ -63,6 +65,13 @@ export default function Home() {
   const [filter, setFilter] = useState('ทั้งหมด')
   const [search, setSearch] = useState('')
 
+  const hasConvex = !!import.meta.env.VITE_CONVEX_URL
+
+  // Unconditional hook calls at top level
+  // Convex React client will handle cases where client is not connected
+  const convexProducts = useQuery(hasConvex ? api.products.list : api.products.list)
+  const convexReviews = useQuery(hasConvex ? api.reviews.list : api.reviews.list)
+
   const fetchData = async (showLoading = true) => {
     if (showLoading) setLoading(true)
     try {
@@ -104,21 +113,34 @@ export default function Home() {
     }
   }
 
+  // Effect to sync Convex data if VITE_CONVEX_URL is set
   useEffect(() => {
-    fetchData(true)
-
-    // Realtime postgres changes subscription
-    const channel = supabase
-      .channel('public:products')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
-        fetchData(false)
-      })
-      .subscribe()
-
-    return () => {
-      supabase.removeChannel(channel)
+    if (hasConvex && convexProducts && convexReviews) {
+      // Map Convex internal IDs to string id fields for compatibility
+      setProducts(convexProducts.map(p => ({ ...p, id: p._id })))
+      setReviews(convexReviews.map(r => ({ ...r, id: r._id })))
+      setLoading(false)
     }
-  }, [])
+  }, [convexProducts, convexReviews, hasConvex])
+
+  // Effect to load Supabase/Fallback data only if VITE_CONVEX_URL is NOT set
+  useEffect(() => {
+    if (!hasConvex) {
+      fetchData(true)
+
+      // Realtime postgres changes subscription
+      const channel = supabase
+        .channel('public:products')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => {
+          fetchData(false)
+        })
+        .subscribe()
+
+      return () => {
+        supabase.removeChannel(channel)
+      }
+    }
+  }, [hasConvex])
 
   const filtered = products.filter(p => {
     const matchStatus = filter === 'ทั้งหมด' || p.status === filter
