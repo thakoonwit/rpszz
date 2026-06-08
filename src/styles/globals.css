@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800;12..96,900&family=Chakra+Petch:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -5,20 +7,19 @@
 }
 
 :root {
-  --navy: #0a0f1e;
-  --navy-2: #111827;
-  --navy-3: #1a2235;
-  --navy-4: #243048;
-  --red: #e5172b;
-  --red-dark: #b5101e;
-  --red-dim: rgba(229, 23, 43, 0.15);
-  --white: #f8f9fc;
-  --white-dim: rgba(248, 249, 252, 0.08);
-  --white-muted: rgba(248, 249, 252, 0.5);
-  --border: rgba(248, 249, 252, 0.1);
-  --border-red: rgba(229, 23, 43, 0.3);
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body: 'Sarabun', sans-serif;
+  /* OKLCH Design Tokens from DESIGN.md */
+  --bg: oklch(0.10 0.015 262);           /* Deep dark blue-black background */
+  --surface: oklch(0.14 0.025 262);      /* Surface color for cards and panels */
+  --border: oklch(0.22 0.03 262);        /* Border lines (sleek 1px style) */
+  --ink: oklch(0.98 0.005 262);          /* Pure off-white high-contrast body text */
+  --muted: oklch(0.74 0.01 262);         /* Dimmed text color for descriptions */
+  --primary: oklch(0.55 0.18 262.4);     /* Deep cobalt electric blue seed */
+  --primary-dim: oklch(0.55 0.18 262.4 / 0.15);
+  --accent: oklch(0.58 0.22 25);         /* Vibrant deep red accent */
+  --accent-dark: oklch(0.48 0.22 25);
+
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-body: 'Chakra Petch', sans-serif;
 }
 
 html {
@@ -26,8 +27,8 @@ html {
 }
 
 body {
-  background: var(--navy);
-  color: var(--white);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
@@ -56,9 +57,10 @@ img {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--navy); }
-::-webkit-scrollbar-thumb { background: var(--navy-4); border-radius: 2px; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 /* Utility */
 .container {
@@ -72,11 +74,11 @@ img {
   padding: 2px 10px;
   border-radius: 2px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.badge-available   { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
-.badge-reserved    { background: rgba(234, 179, 8, 0.15);  color: #fbbf24; border: 1px solid rgba(234, 179, 8, 0.25); }
-.badge-sold        { background: rgba(229, 23, 43, 0.15);  color: #f87171; border: 1px solid rgba(229, 23, 43, 0.25); }
+.badge-available   { background: oklch(0.86 0.19 145 / 0.1); color: oklch(0.86 0.19 145); border: 1px solid oklch(0.86 0.19 145 / 0.2); }
+.badge-reserved    { background: oklch(0.79 0.16 85 / 0.1);  color: oklch(0.79 0.16 85); border: 1px solid oklch(0.79 0.16 85 / 0.2); }
+.badge-sold        { background: oklch(0.58 0.22 25 / 0.1);  color: oklch(0.58 0.22 25); border: 1px solid oklch(0.58 0.22 25 / 0.2); }

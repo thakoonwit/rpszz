@@ -1,76 +1,79 @@
 .page {
   min-height: calc(100vh - 64px);
-  padding: 80px 0;
+  padding: 100px 0;
 }
 
 .header {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(48px, 8vw, 96px);
-  line-height: 0.95;
-  color: var(--white);
-  letter-spacing: 0.02em;
-  margin-bottom: 16px;
+  font-size: clamp(56px, 8vw, 100px);
+  line-height: 0.9;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+  margin-bottom: 20px;
 }
 
 .title span {
-  color: var(--red);
+  color: var(--accent);
 }
 
 .sub {
   font-size: 15px;
-  color: var(--white-muted);
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .form {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 
 .inputGroup {
   display: flex;
   gap: 0;
-  max-width: 480px;
+  max-width: 500px;
 }
 
 .input {
   flex: 1;
-  padding: 14px 20px;
-  background: var(--navy-2);
+  padding: 16px 24px;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-right: none;
   border-radius: 2px 0 0 2px;
-  color: var(--white);
+  color: var(--ink);
   font-size: 16px;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input::placeholder {
-  color: var(--white-muted);
+  color: var(--muted);
 }
 
 .input:focus {
   outline: none;
-  border-color: rgba(248, 249, 252, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 0 8px var(--primary-dim);
 }
 
 .searchBtn {
-  padding: 14px 28px;
-  background: var(--red);
-  color: var(--white);
+  padding: 16px 36px;
+  background: var(--accent);
+  color: var(--ink);
   font-size: 14px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 0 2px 2px 0;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
   white-space: nowrap;
 }
 
 .searchBtn:hover:not(:disabled) {
-  background: var(--red-dark);
+  background: var(--accent-dark);
+  box-shadow: 0 0 12px oklch(0.58 0.22 25 / 0.3);
 }
 
 .searchBtn:disabled {
@@ -81,43 +84,50 @@
 .results {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
 
 .resultMeta {
   font-size: 13px;
-  color: var(--white-muted);
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  font-weight: 600;
 }
 
 .orderList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-width: 640px;
+  gap: 16px;
+  max-width: 680px;
 }
 
 .orderCard {
-  background: var(--navy-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 4px;
   overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.orderCard:hover {
+  border-color: var(--primary);
 }
 
 .orderTop {
   display: flex;
-  gap: 16px;
-  padding: 20px;
+  gap: 20px;
+  padding: 24px;
   align-items: flex-start;
 }
 
 .thumb {
-  width: 72px;
-  height: 72px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 2px;
   flex-shrink: 0;
+  border: 1px solid var(--border);
 }
 
 .orderInfo {
@@ -126,21 +136,23 @@
 }
 
 .productName {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--white);
-  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
 }
 
 .orderDate {
   font-size: 13px;
-  color: var(--white-muted);
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .note {
-  font-size: 12px;
-  color: var(--white-muted);
-  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
   font-style: italic;
 }
 
@@ -148,71 +160,72 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .statusIcon {
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
 }
 
 .statusLabel {
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .orderBottom {
-  padding: 12px 20px;
+  padding: 16px 24px;
   border-top: 1px solid var(--border);
-  background: var(--navy-3);
+  background: var(--bg);
 }
 
 .priceTag {
   font-family: var(--font-display);
-  font-size: 22px;
-  color: var(--white);
+  font-size: 24px;
+  color: var(--ink);
 }
 
 .empty {
-  padding: 48px 0;
-  max-width: 400px;
+  padding: 64px 0;
+  max-width: 450px;
 }
 
 .empty p {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--white);
-  margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
 }
 
 .empty span {
   font-size: 14px;
-  color: var(--white-muted);
+  color: var(--muted);
 }
 
 .chatNote {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: 20px;
+  padding: 24px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--navy-3);
-  max-width: 400px;
+  background: var(--surface);
+  max-width: 480px;
 }
 
 .chatNote p {
   flex: 1;
   font-size: 14px;
-  color: var(--white-muted);
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .lineBtn {
-  padding: 8px 20px;
+  padding: 10px 24px;
   background: #06c755;
   color: #fff;
   font-size: 13px;
@@ -220,6 +233,8 @@
   border-radius: 2px;
   white-space: nowrap;
   transition: opacity 0.2s;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .lineBtn:hover {

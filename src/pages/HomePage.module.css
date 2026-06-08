@@ -1,43 +1,43 @@
 /* Hero */
 .hero {
   position: relative;
-  padding: 100px 0 80px;
+  padding: 120px 0 100px;
   overflow: hidden;
 }
 
 .heroContent {
   position: relative;
   z-index: 1;
-  max-width: 600px;
+  max-width: 650px;
 }
 
 .tagline {
   font-size: 13px;
-  color: var(--red);
-  letter-spacing: 0.12em;
+  color: var(--accent);
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  font-weight: 600;
-  margin-bottom: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
 }
 
 .heroTitle {
   font-family: var(--font-display);
-  font-size: clamp(72px, 12vw, 140px);
-  line-height: 0.9;
-  color: var(--white);
-  letter-spacing: -0.01em;
+  font-size: clamp(64px, 12vw, 130px);
+  line-height: 0.85;
+  color: var(--ink);
+  letter-spacing: -0.02em;
   margin-bottom: 24px;
 }
 
 .heroShop {
-  color: var(--red);
+  color: var(--accent);
 }
 
 .heroSub {
   font-size: 16px;
-  color: var(--white-muted);
-  line-height: 1.7;
-  margin-bottom: 36px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 40px;
 }
 
 .heroActions {
@@ -48,35 +48,37 @@
 
 .primaryBtn {
   display: inline-block;
-  padding: 14px 32px;
-  background: var(--red);
-  color: var(--white);
+  padding: 16px 36px;
+  background: var(--accent);
+  color: var(--ink);
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   border-radius: 2px;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 .primaryBtn:hover {
-  background: var(--red-dark);
+  background: var(--accent-dark);
+  box-shadow: 0 0 16px oklch(0.58 0.22 25 / 0.4);
 }
 
 .secondaryBtn {
   display: inline-block;
-  padding: 14px 32px;
+  padding: 16px 36px;
   border: 1px solid var(--border);
-  color: var(--white-muted);
+  color: var(--muted);
   font-size: 14px;
   letter-spacing: 0.06em;
   border-radius: 2px;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .secondaryBtn:hover {
-  border-color: var(--white);
-  color: var(--white);
+  border-color: var(--ink);
+  color: var(--ink);
+  background: var(--border);
 }
 
 .heroAccent {
@@ -86,7 +88,7 @@
   width: 600px;
   height: 600px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(229, 23, 43, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--primary-dim) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -94,203 +96,215 @@
 .statsBar {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  background: var(--navy-2);
-  padding: 24px 0;
+  background: var(--surface);
+  padding: 28px 0;
 }
 
 .stats {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 40px;
 }
 
 .stat {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
 }
 
 .statNum {
   font-family: var(--font-display);
-  font-size: 40px;
-  color: #4ade80;
+  font-size: 44px;
+  color: oklch(0.86 0.19 145);
   line-height: 1;
 }
 
-.statNum.yellow { color: #fbbf24; }
-.statNum.red    { color: #f87171; }
+.statNum.yellow { color: oklch(0.79 0.16 85); }
+.statNum.red    { color: oklch(0.58 0.22 25); }
 
 .statLabel {
   font-size: 13px;
-  color: var(--white-muted);
+  color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
+  font-weight: 600;
 }
 
 .statDivider {
   width: 1px;
-  height: 32px;
+  height: 36px;
   background: var(--border);
 }
 
 /* Products */
 .productsSection {
-  padding: 60px 0 80px;
+  padding: 80px 0 100px;
 }
 
 .controls {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 32px;
+  gap: 20px;
+  margin-bottom: 40px;
   flex-wrap: wrap;
 }
 
 .filterGroup {
   display: flex;
-  gap: 4px;
+  gap: 6px;
 }
 
 .filterBtn {
-  padding: 8px 16px;
+  padding: 10px 20px;
   background: transparent;
-  color: var(--white-muted);
+  color: var(--muted);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   border: 1px solid var(--border);
   border-radius: 2px;
-  letter-spacing: 0.04em;
-  transition: all 0.15s;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
 }
 
 .filterBtn:hover {
-  color: var(--white);
-  border-color: rgba(248, 249, 252, 0.25);
+  color: var(--ink);
+  border-color: var(--muted);
 }
 
 .filterBtn.activeFilter {
-  background: var(--white-dim);
-  color: var(--white);
-  border-color: rgba(248, 249, 252, 0.25);
+  background: var(--border);
+  color: var(--ink);
+  border-color: var(--primary);
+  box-shadow: 0 0 8px var(--primary-dim);
 }
 
 .searchInput {
-  padding: 8px 16px;
-  background: var(--navy-2);
+  padding: 10px 20px;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 2px;
-  color: var(--white);
+  color: var(--ink);
   font-size: 13px;
-  width: 220px;
-  transition: border-color 0.15s;
+  width: 250px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchInput::placeholder {
-  color: var(--white-muted);
+  color: var(--muted);
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: rgba(248, 249, 252, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 0 8px var(--primary-dim);
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
 }
 
 .loading, .empty {
   text-align: center;
-  padding: 80px 0;
-  color: var(--white-muted);
+  padding: 100px 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .spinner {
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--border);
-  border-top-color: var(--red);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
-  margin: 0 auto 16px;
+  margin: 0 auto 20px;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Reviews */
 .reviewSection {
-  padding: 60px 0 80px;
+  padding: 80px 0 100px;
   border-top: 1px solid var(--border);
-  background: var(--navy-2);
+  background: var(--surface);
 }
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-size: 36px;
-  letter-spacing: 0.04em;
-  color: var(--white);
-  margin-bottom: 32px;
+  font-size: 44px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  margin-bottom: 40px;
+  line-height: 1.1;
 }
 
 .reviewGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
 }
 
 .reviewCard {
-  padding: 24px;
+  padding: 28px;
   border: 1px solid var(--border);
   border-radius: 4px;
-  background: var(--navy-3);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  transition: border-color 0.2s;
+}
+
+.reviewCard:hover {
+  border-color: var(--primary);
 }
 
 .stars {
-  color: #fbbf24;
-  font-size: 16px;
-  letter-spacing: 2px;
+  color: oklch(0.79 0.16 85);
+  font-size: 18px;
+  letter-spacing: 3px;
 }
 
 .reviewText {
   font-size: 14px;
-  color: var(--white-muted);
-  line-height: 1.6;
+  color: var(--muted);
+  line-height: 1.7;
   font-style: italic;
   flex: 1;
 }
 
 .reviewer {
   font-size: 13px;
-  font-weight: 600;
-  color: var(--white);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.05em;
 }
 
 /* Footer */
 .footer {
-  padding: 40px 0;
+  padding: 50px 0;
   border-top: 1px solid var(--border);
   text-align: center;
 }
 
 .footerLogo {
   font-family: var(--font-display);
-  font-size: 32px;
+  font-size: 36px;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .footerSub {
   font-size: 13px;
-  color: var(--white-muted);
-  margin-bottom: 16px;
+  color: var(--muted);
+  margin-bottom: 20px;
 }
 
 .footerCopy {
   font-size: 12px;
-  color: rgba(248, 249, 252, 0.3);
+  color: rgba(248, 249, 252, 0.2);
 }
