@@ -5,12 +5,12 @@ import { useConvex } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 
 const STATUS_MAP = {
-  preparing: { label: 'กำลังเตรียมสินค้า', color: '#fbbf24', icon: '○' },
-  shipped:   { label: 'จัดส่งแล้ว',       color: '#fbbf24', icon: '◑' },
-  delivered: { label: 'จัดส่งสำเร็จ',     color: '#4ade80', icon: '●' },
+  preparing: { label: 'กำลังเตรียมสินค้า', color: 'oklch(0.50 0.12 85)', icon: '○' },
+  shipped:   { label: 'จัดส่งแล้ว',       color: 'oklch(0.50 0.12 85)', icon: '◑' },
+  delivered: { label: 'จัดส่งสำเร็จ',     color: 'oklch(0.40 0.15 145)', icon: '●' },
   // Compatibility fallbacks
-  reserved:  { label: 'จองสำเร็จแล้ว',    color: '#fbbf24', icon: '◑' },
-  sold:      { label: 'ดำเนินการแล้ว',    color: '#f87171', icon: '●' },
+  reserved:  { label: 'จองสำเร็จแล้ว',    color: 'oklch(0.50 0.12 85)', icon: '◑' },
+  sold:      { label: 'ดำเนินการแล้ว',    color: 'var(--accent)', icon: '●' },
 }
 
 const MOCK_ORDERS = [
@@ -113,17 +113,17 @@ export default function StatusCheck() {
 
         {!searched && (
           <div style={{
-            backgroundColor: 'var(--navy-2)',
+            backgroundColor: 'var(--surface)',
             border: '1px solid var(--border)',
             borderRadius: '4px',
             padding: '20px',
             maxWidth: '480px',
             fontSize: '14px',
-            color: 'var(--white-muted)'
+            color: 'var(--muted)'
           }}>
-            <p style={{ fontWeight: 600, color: 'var(--white)', marginBottom: '8px' }}>ทดลองค้นหาสถานะ (Demo):</p>
-            <p>เบอร์ <strong style={{ color: 'var(--white)' }}>0898765432</strong>: สถานะ "กำลังเตรียมสินค้า"</p>
-            <p>เบอร์ <strong style={{ color: 'var(--white)' }}>0812345678</strong>: สถานะ "จัดส่งสำเร็จ"</p>
+            <p style={{ fontWeight: 600, color: 'var(--ink)', marginBottom: '8px' }}>ทดลองค้นหาสถานะ (Demo):</p>
+            <p>เบอร์ <strong style={{ color: 'var(--ink)' }}>0898765432</strong>: สถานะ "กำลังเตรียมสินค้า"</p>
+            <p>เบอร์ <strong style={{ color: 'var(--ink)' }}>0812345678</strong>: สถานะ "จัดส่งสำเร็จ"</p>
           </div>
         )}
 
@@ -165,7 +165,7 @@ export default function StatusCheck() {
                               })}
                             </p>
                             {order.tracking_number && (
-                              <p className={styles.note} style={{ fontStyle: 'normal', color: 'var(--white)' }}>
+                              <p className={styles.note} style={{ fontStyle: 'normal', color: 'var(--ink)' }}>
                                 เลขพัสดุ: <strong>{order.tracking_number}</strong>
                               </p>
                             )}

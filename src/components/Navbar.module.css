@@ -19,19 +19,28 @@
 
 .logo {
   font-family: var(--font-display);
-  font-size: 28px;
-  letter-spacing: 0.05em;
-  color: var(--white);
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: var(--ink);
   line-height: 1;
 }
 
-.logoR {
-  color: var(--red);
+.logoImg {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px var(--primary-dim));
 }
 
-.logoDot {
-  color: var(--white-muted);
-  font-size: 20px;
+.logoText {
+  display: flex;
+  align-items: center;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.logoR {
+  color: var(--accent);
 }
 
 .links {
@@ -43,7 +52,7 @@
 .links a {
   font-size: 14px;
   font-weight: 500;
-  color: var(--white-muted);
+  color: var(--muted);
   letter-spacing: 0.04em;
   transition: color 0.2s;
   text-transform: uppercase;
@@ -51,13 +60,13 @@
 
 .links a:hover,
 .links a.active {
-  color: var(--white);
+  color: var(--ink);
 }
 
 .ctaLink {
   padding: 8px 20px !important;
-  background: var(--red) !important;
-  color: var(--white) !important;
+  background: var(--accent) !important;
+  color: oklch(0.99 0.002 262) !important; /* light text on red button */
   border-radius: 2px;
   font-weight: 600 !important;
   letter-spacing: 0.06em;
@@ -65,8 +74,8 @@
 }
 
 .ctaLink:hover {
-  background: var(--red-dark) !important;
-  color: var(--white) !important;
+  background: var(--accent-dark) !important;
+  color: oklch(0.99 0.002 262) !important;
 }
 
 .burger {
@@ -81,7 +90,7 @@
   display: block;
   width: 22px;
   height: 1.5px;
-  background: var(--white);
+  background: var(--ink);
 }
 
 @media (max-width: 768px) {
@@ -93,7 +102,7 @@
     top: 64px;
     left: 0;
     right: 0;
-    background: var(--navy-2);
+    background: var(--surface);
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 24px;

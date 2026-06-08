@@ -9,11 +9,10 @@ export default function Navbar() {
   return (
     <nav className={styles.nav}>
       <div className={styles.inner}>
-        <Link to="/" className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/logo.png" alt="RPSZZ Logo" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
-          <span>
+        <Link to="/" className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <img src="/logo.png" alt="RPSZZ Logo" className={styles.logoImg} />
+          <span className={styles.logoText}>
             <span className={styles.logoR}>R</span>PSZZ
-            <span className={styles.logoDot}>.shop</span>
           </span>
         </Link>
 

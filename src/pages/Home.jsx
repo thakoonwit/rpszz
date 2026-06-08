@@ -163,8 +163,7 @@ export default function Home() {
           <div className={styles.heroContent}>
             <p className={styles.tagline}>— มือสองคุณภาพ คัดมาแล้ว</p>
             <h1 className={styles.heroTitle}>
-              RPSZZ<br />
-              <span className={styles.heroShop}>.SHOP</span>
+              RPSZZ
             </h1>
             <p className={styles.heroSub}>
               ของมือสองของ Rapeepong ทุกชิ้นผ่านการคัดสรร<br />
@@ -274,12 +273,12 @@ export default function Home() {
       {/* Footer */}
       <footer className={styles.footer}>
         <div className="container">
-          <p className={styles.footerLogo} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <img src="/logo.png" alt="RPSZZ Logo" style={{ height: '28px', width: 'auto', objectFit: 'contain' }} />
-            <span><span style={{ color: 'var(--red)' }}>R</span>PSZZ.shop</span>
+          <p className={styles.footerLogo} style={{ display: 'flex', alignItems: 'center', justifyCenter: 'center', gap: '8px' }}>
+            <img src="/logo.png" alt="RPSZZ Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+            <span><span style={{ color: 'var(--accent)' }}>R</span>PSZZ</span>
           </p>
           <p className={styles.footerSub}>สินค้าทุกชิ้นสั่งซื้อผ่านแชทเท่านั้น — ไม่มีระบบตะกร้าสินค้า</p>
-          <p className={styles.footerCopy}>© 2026 Rapeepong · Rpszz.shop</p>
+          <p className={styles.footerCopy}>© 2026 Rapeepong · Rpszz</p>
         </div>
       </footer>
     </main>
