@@ -1,0 +1,227 @@
+.page {
+  min-height: calc(100vh - 64px);
+  padding: 80px 0;
+}
+
+.header {
+  margin-bottom: 48px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 8vw, 96px);
+  line-height: 0.95;
+  color: var(--white);
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+
+.title span {
+  color: var(--red);
+}
+
+.sub {
+  font-size: 15px;
+  color: var(--white-muted);
+}
+
+.form {
+  margin-bottom: 48px;
+}
+
+.inputGroup {
+  display: flex;
+  gap: 0;
+  max-width: 480px;
+}
+
+.input {
+  flex: 1;
+  padding: 14px 20px;
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 2px 0 0 2px;
+  color: var(--white);
+  font-size: 16px;
+  transition: border-color 0.15s;
+}
+
+.input::placeholder {
+  color: var(--white-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(248, 249, 252, 0.3);
+}
+
+.searchBtn {
+  padding: 14px 28px;
+  background: var(--red);
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 0 2px 2px 0;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.searchBtn:hover:not(:disabled) {
+  background: var(--red-dark);
+}
+
+.searchBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.resultMeta {
+  font-size: 13px;
+  color: var(--white-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+}
+
+.orderCard {
+  background: var(--navy-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.orderTop {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+.thumb {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.orderInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 4px;
+}
+
+.orderDate {
+  font-size: 13px;
+  color: var(--white-muted);
+}
+
+.note {
+  font-size: 12px;
+  color: var(--white-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.statusWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.statusIcon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.statusLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.orderBottom {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--navy-3);
+}
+
+.priceTag {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--white);
+}
+
+.empty {
+  padding: 48px 0;
+  max-width: 400px;
+}
+
+.empty p {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.empty span {
+  font-size: 14px;
+  color: var(--white-muted);
+}
+
+.chatNote {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--navy-3);
+  max-width: 400px;
+}
+
+.chatNote p {
+  flex: 1;
+  font-size: 14px;
+  color: var(--white-muted);
+}
+
+.lineBtn {
+  padding: 8px 20px;
+  background: #06c755;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 2px;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.lineBtn:hover {
+  opacity: 0.9;
+}
