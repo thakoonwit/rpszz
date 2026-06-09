@@ -43,7 +43,6 @@ export default function AdminDashboard() {
   const hasConvex = !!import.meta.env.VITE_CONVEX_URL
   const convex = useConvex()
   const generateUploadUrl = useMutation(api.products.generateUploadUrl)
-  const getImageUrl = useMutation(api.products.getImageUrl) // Retrieve URL mutation
 
   async function handleImageUpload(e) {
     const files = Array.from(e.target.files)
