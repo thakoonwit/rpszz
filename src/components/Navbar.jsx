@@ -23,9 +23,7 @@ export default function Navbar() {
           <Link to="/track" className={pathname === '/track' ? styles.active : ''} onClick={() => setOpen(false)}>
             เช็คสถานะ
           </Link>
-          <Link to="/admin" className={pathname === '/admin' ? styles.active : ''} onClick={() => setOpen(false)}>
-            ผู้ดูแลระบบ
-          </Link>
+
           <a
             href="https://line.me/ti/p/~YOUR_LINE_ID"
             target="_blank"
