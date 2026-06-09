@@ -18,10 +18,13 @@ export default defineSchema({
     status: v.string(), // "preparing", "shipped", "delivered"
     tracking_number: v.optional(v.string()),
     note: v.optional(v.string()),
+    delivery_image_url: v.optional(v.string()),
   }),
   reviews: defineTable({
     customer_name: v.string(),
     rating: v.number(),
     comment: v.optional(v.string()),
+    facebook_url: v.optional(v.string()),
+    avatar_url: v.optional(v.string()),
   }),
 });

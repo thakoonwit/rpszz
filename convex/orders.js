@@ -63,6 +63,7 @@ export const add = mutation({
     status: v.string(),
     tracking_number: v.optional(v.string()),
     note: v.optional(v.string()),
+    delivery_image_url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("orders", args);
@@ -78,6 +79,7 @@ export const update = mutation({
     status: v.string(),
     tracking_number: v.optional(v.string()),
     note: v.optional(v.string()),
+    delivery_image_url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const { id, ...data } = args;

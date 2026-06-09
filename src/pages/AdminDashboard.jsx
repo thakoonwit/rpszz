@@ -11,7 +11,11 @@ const EMPTY_FORM = {
 }
 
 const EMPTY_ORDER_FORM = {
-  customer_name: '', customer_phone: '', product_id: '', status: 'preparing', tracking_number: '', note: ''
+  customer_name: '', customer_phone: '', product_id: '', status: 'preparing', tracking_number: '', note: '', delivery_image_url: ''
+}
+
+const EMPTY_REVIEW_FORM = {
+  customer_name: '', rating: 5, comment: '', facebook_url: '', avatar_url: ''
 }
 
 const INITIAL_PRODUCTS = [
@@ -25,24 +29,37 @@ const INITIAL_ORDERS = [
   { id: 'o2', customer_name: 'Sompong K.', customer_phone: '0812345678', product_id: '3', status: 'delivered', tracking_number: 'TH12345678901', updated_at: new Date().toISOString(), product: { title: 'Analog Film Camera', name: 'Analog Film Camera', price: 3400 } }
 ]
 
+const INITIAL_REVIEWS = [
+  { id: 'r1', customer_name: 'คุณอมรเทพ ส.', rating: 5, comment: 'สภาพกล้องสวยถูกใจตามในรูปเปะครับ', facebook_url: 'https://facebook.com', avatar_url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=anan' }
+]
+
 export default function AdminDashboard() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(localStorage.getItem('rpszz_admin_session') === 'authenticated')
   const [products, setProducts] = useState([])
   const [orders, setOrders] = useState([])
+  const [reviews, setReviews] = useState([])
   const [form, setForm] = useState(EMPTY_FORM)
   const [orderForm, setOrderForm] = useState(EMPTY_ORDER_FORM)
+  const [reviewForm, setReviewForm] = useState(EMPTY_REVIEW_FORM)
   const [editing, setEditing] = useState(null)
   const [editingOrder, setEditingOrder] = useState(null)
+  const [editingReview, setEditingReview] = useState(null)
   const [tab, setTab] = useState('products')
   const [loading, setLoading] = useState(false)
   const [usingFallback, setUsingFallback] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingParcel, setUploadingParcel] = useState(false)
 
   const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD || 'rpszz2025'
   const hasConvex = !!import.meta.env.VITE_CONVEX_URL
   const convex = useConvex()
   const generateUploadUrl = useMutation(api.products.generateUploadUrl)
+
+  // Review Mutations
+  const addReview = useMutation(api.reviews.add)
+  const updateReview = useMutation(api.reviews.update)
+  const deleteReview = useMutation(api.reviews.deleteReview)
 
   async function handleImageUpload(e) {
     const files = Array.from(e.target.files)
@@ -54,16 +71,12 @@ export default function AdminDashboard() {
     for (const file of files) {
       try {
         if (usingFallback || !hasConvex) {
-          // If in offline fallback mode, generate a local Blob Object URL so previewing still functions
           const localUrl = URL.createObjectURL(file)
           uploadedUrls.push(localUrl)
           continue
         }
 
-        // 1. Generate Convex Upload URL endpoint
         const uploadUrl = await generateUploadUrl()
-
-        // 2. POST file directly to Convex storage
         const result = await fetch(uploadUrl, {
           method: "POST",
           headers: { "Content-Type": file.type },
@@ -75,8 +88,6 @@ export default function AdminDashboard() {
         }
 
         const { storageId } = await result.json()
-
-        // 3. Get public download URL from Convex HTTP storage
         const publicUrl = await convex.query(api.products.getImageUrl, { storageId })
         if (publicUrl) {
           uploadedUrls.push(publicUrl)
@@ -85,7 +96,7 @@ export default function AdminDashboard() {
         }
       } catch (err) {
         console.error('Error uploading file:', err)
-        toast.error(`อัปเดตปุ่มรูป ${file.name} ล้มเหลว: ${err.message || 'โปรดตรวจสอบสิทธิ์การใช้งาน Storage ใน Convex Console'}`)
+        toast.error(`อัปโหลดรูปภาพล้มเหลว: ${err.message}`)
       }
     }
 
@@ -97,6 +108,47 @@ export default function AdminDashboard() {
     }
     setUploading(false)
     e.target.value = ''
+  }
+
+  async function handleParcelImageUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+
+    setUploadingParcel(true)
+    try {
+      if (usingFallback || !hasConvex) {
+        const localUrl = URL.createObjectURL(file)
+        setOrderForm(prev => ({ ...prev, delivery_image_url: localUrl }))
+        setUploadingParcel(false)
+        return
+      }
+
+      const uploadUrl = await generateUploadUrl()
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      })
+
+      if (!result.ok) {
+        throw new Error(`Convex storage upload failed with status ${result.status}`)
+      }
+
+      const { storageId } = await result.json()
+      const publicUrl = await convex.query(api.products.getImageUrl, { storageId })
+      
+      if (publicUrl) {
+        setOrderForm(prev => ({ ...prev, delivery_image_url: publicUrl }))
+        toast.success("อัปโหลดรูปถ่ายพัสดุสำเร็จ")
+      } else {
+        throw new Error('Could not retrieve public URL for storage ID')
+      }
+    } catch (err) {
+      console.error('Error uploading parcel file:', err)
+      toast.error(`อัปโหลดรูปภาพล้มเหลว: ${err.message}`)
+    } finally {
+      setUploadingParcel(false)
+    }
   }
 
   function handleLogin(e) {
@@ -122,8 +174,10 @@ export default function AdminDashboard() {
       if (hasConvex && convex) {
         const p = await convex.query(api.products.list)
         const o = await convex.query(api.orders.list)
+        const r = await convex.query(api.reviews.list)
         setProducts(p.map(x => ({ ...x, id: x._id })))
         setOrders(o.map(x => ({ ...x, id: x._id, product: x.product ? { ...x.product, id: x.product._id } : null })))
+        setReviews(r.map(x => ({ ...x, id: x._id })))
         setUsingFallback(false)
         return
       }
@@ -139,6 +193,7 @@ export default function AdminDashboard() {
 
       setProducts(p || [])
       setOrders(o || [])
+      setReviews(INITIAL_REVIEWS)
       setUsingFallback(false)
     } catch (err) {
       console.warn('Using fallback local storage data:', err)
@@ -148,8 +203,12 @@ export default function AdminDashboard() {
       if (!localStorage.getItem('rpszz_local_orders')) {
         localStorage.setItem('rpszz_local_orders', JSON.stringify(INITIAL_ORDERS))
       }
+      if (!localStorage.getItem('rpszz_local_reviews')) {
+        localStorage.setItem('rpszz_local_reviews', JSON.stringify(INITIAL_REVIEWS))
+      }
       setProducts(JSON.parse(localStorage.getItem('rpszz_local_products')))
       setOrders(JSON.parse(localStorage.getItem('rpszz_local_orders')))
+      setReviews(JSON.parse(localStorage.getItem('rpszz_local_reviews')))
       setUsingFallback(true)
     }
   }
@@ -239,6 +298,7 @@ export default function AdminDashboard() {
       status: orderForm.status,
       tracking_number: orderForm.tracking_number || undefined,
       note: orderForm.note || undefined,
+      delivery_image_url: orderForm.delivery_image_url || undefined,
     }
 
     if (usingFallback) {
@@ -308,6 +368,56 @@ export default function AdminDashboard() {
     setLoading(false)
   }
 
+  async function handleReviewSubmit(e) {
+    e.preventDefault()
+    setLoading(true)
+    const payload = {
+      customer_name: reviewForm.customer_name,
+      rating: Number(reviewForm.rating),
+      comment: reviewForm.comment || undefined,
+      facebook_url: reviewForm.facebook_url || undefined,
+      avatar_url: reviewForm.avatar_url || undefined,
+    }
+
+    if (usingFallback) {
+      let localRevs = JSON.parse(localStorage.getItem('rpszz_local_reviews')) || []
+      if (editingReview) {
+        localRevs = localRevs.map(r => r.id === editingReview ? { ...r, ...payload } : r)
+        toast.success('อัปเดตรีวิวสำเร็จ')
+      } else {
+        const newRev = { id: 'r' + Date.now().toString(), ...payload }
+        localRevs.unshift(newRev)
+        toast.success('เพิ่มรีวิวสำเร็จ')
+      }
+      localStorage.setItem('rpszz_local_reviews', JSON.stringify(localRevs))
+      setReviewForm(EMPTY_REVIEW_FORM)
+      setEditingReview(null)
+      setTab('reviews')
+      fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        if (editingReview) {
+          await updateReview({ id: editingReview, ...payload })
+          toast.success('อัปเดตรีวิวสำเร็จ')
+          setEditingReview(null)
+          setReviewForm(EMPTY_REVIEW_FORM)
+          setTab('reviews')
+        } else {
+          await addReview(payload)
+          toast.success('เพิ่มรีวิวสำเร็จ')
+          setReviewForm(EMPTY_REVIEW_FORM)
+          setTab('reviews')
+        }
+        fetchAll()
+      } catch (err) {
+        toast.error('ไม่สำเร็จ: ' + err.message)
+      }
+    } else {
+      toast.error('รีวิวจัดเก็บแบบออฟไลน์/Convex เท่านั้น')
+    }
+    setLoading(false)
+  }
+
   async function handleDelete(id) {
     if (!confirm('ลบสินค้านี้?')) return
     if (usingFallback) {
@@ -356,6 +466,25 @@ export default function AdminDashboard() {
       else {
         toast.success('ลบคำสั่งซื้อแล้ว')
         fetchAll()
+      }
+    }
+  }
+
+  async function handleDeleteReview(id) {
+    if (!confirm('ลบรีวิวนี้?')) return
+    if (usingFallback) {
+      const localRevs = JSON.parse(localStorage.getItem('rpszz_local_reviews')) || []
+      const filtered = localRevs.filter(r => r.id !== id)
+      localStorage.setItem('rpszz_local_reviews', JSON.stringify(filtered))
+      toast.success('ลบรีวิวแล้ว')
+      fetchAll()
+    } else if (hasConvex && convex) {
+      try {
+        await deleteReview({ id })
+        toast.success('ลบรีวิวแล้ว')
+        fetchAll()
+      } catch (err) {
+        toast.error('ลบไม่สำเร็จ: ' + err.message)
       }
     }
   }
@@ -412,6 +541,7 @@ export default function AdminDashboard() {
           product_id: o.product_id,
           tracking_number: o.tracking_number,
           note: o.note,
+          delivery_image_url: o.delivery_image_url,
           status
         })
         toast.success('อัปเดตสถานะสำเร็จ')
@@ -451,9 +581,23 @@ export default function AdminDashboard() {
       product_id: o.product_id || '',
       status: o.status,
       tracking_number: o.tracking_number || '',
-      note: o.note || ''
+      note: o.note || '',
+      delivery_image_url: o.delivery_image_url || ''
     })
     setTab('orderForm')
+    window.scrollTo(0, 0)
+  }
+
+  function startReviewEdit(r) {
+    setEditingReview(r.id)
+    setReviewForm({
+      customer_name: r.customer_name,
+      rating: r.rating,
+      comment: r.comment || '',
+      facebook_url: r.facebook_url || '',
+      avatar_url: r.avatar_url || ''
+    })
+    setTab('reviewForm')
     window.scrollTo(0, 0)
   }
 
@@ -508,11 +652,17 @@ export default function AdminDashboard() {
           <button className={`${styles.tab} ${tab === 'orders' ? styles.activeTab : ''}`} onClick={() => setTab('orders')}>
             คำสั่งซื้อ ({orders.length})
           </button>
+          <button className={`${styles.tab} ${tab === 'reviews' ? styles.activeTab : ''}`} onClick={() => setTab('reviews')}>
+            รีวิว ({reviews.length})
+          </button>
           <button className={`${styles.tab} ${tab === 'form' ? styles.activeTab : ''}`} onClick={() => { setEditing(null); setForm(EMPTY_FORM); setTab('form') }}>
             {editing ? '✎ แก้ไขสินค้า' : '＋ เพิ่มสินค้า'}
           </button>
           <button className={`${styles.tab} ${tab === 'orderForm' ? styles.activeTab : ''}`} onClick={() => { setEditingOrder(null); setOrderForm(EMPTY_ORDER_FORM); setTab('orderForm') }}>
             {editingOrder ? '✎ แก้ไขคำสั่งซื้อ' : '＋ เพิ่มคำสั่งซื้อ'}
+          </button>
+          <button className={`${styles.tab} ${tab === 'reviewForm' ? styles.activeTab : ''}`} onClick={() => { setEditingReview(null); setReviewForm(EMPTY_REVIEW_FORM); setTab('reviewForm') }}>
+            {editingReview ? '✎ แก้ไขรีวิว' : '＋ เพิ่มรีวิว'}
           </button>
         </div>
 
@@ -559,7 +709,7 @@ export default function AdminDashboard() {
                   placeholder="เช่น https://image1.com, https://image2.com" className={styles.input} />
               </label>
               <label className={`${styles.field} ${styles.fullWidth}`}>
-                <span>อัปโหลดรูปภาพใหม่จากคอมพิวเตอร์ (ไฟล์จะถูกเก็บไว้ที่ Supabase Storage)</span>
+                <span>อัปโหลดรูปภาพใหม่จากคอมพิวเตอร์</span>
                 <input 
                   type="file" 
                   multiple 
@@ -574,7 +724,7 @@ export default function AdminDashboard() {
                 <span>รายละเอียด</span>
                 <textarea value={form.description}
                   onChange={e => setForm({...form, description: e.target.value})}
-                  placeholder="สภาพ, ขนาด, รายละเอียดอื่นๆ"
+                  placeholder="สภาพ, ขนาด, รายละเอียดอื่นๆ (ใส่ % สภาพเพื่อจัดอันดับสินค้าได้ เช่น สภาพ 95%)"
                   rows={3} className={styles.input} />
               </label>
             </div>
@@ -630,6 +780,22 @@ export default function AdminDashboard() {
                   placeholder="TH123456789" className={styles.input} />
               </label>
               <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span>รูปถ่ายพัสดุ / หลักฐานการจัดส่ง (จะไปแสดงผลในหน้าเช็คสถานะพัสดุของลูกค้า)</span>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleParcelImageUpload} 
+                  disabled={uploadingParcel}
+                  className={styles.input} 
+                />
+                {uploadingParcel && <span style={{ color: 'var(--red)', fontSize: '12px', marginTop: '4px' }}>กำลังอัปโหลดรูปภาพพัสดุ...</span>}
+                {orderForm.delivery_image_url && (
+                  <div style={{ marginTop: '12px' }}>
+                    <img src={orderForm.delivery_image_url} alt="Delivery proof" style={{ height: '100px', borderRadius: '4px', border: '1px solid var(--border)' }} />
+                  </div>
+                )}
+              </label>
+              <label className={`${styles.field} ${styles.fullWidth}`}>
                 <span>หมายเหตุ</span>
                 <textarea value={orderForm.note} onChange={e => setOrderForm({...orderForm, note: e.target.value})}
                   placeholder="หมายเหตุเพิ่มเติม" rows={2} className={styles.input} />
@@ -642,6 +808,56 @@ export default function AdminDashboard() {
               {editingOrder && (
                 <button type="button" className={styles.cancelBtn}
                   onClick={() => { setEditingOrder(null); setOrderForm(EMPTY_ORDER_FORM); setTab('orders') }}>
+                  ยกเลิก
+                </button>
+              )}
+            </div>
+          </form>
+        )}
+
+        {/* Review Form */}
+        {tab === 'reviewForm' && (
+          <form onSubmit={handleReviewSubmit} className={styles.form}>
+            <h2 className={styles.formTitle}>{editingReview ? 'แก้ไขรีวิว' : 'เพิ่มรีวิวใหม่'}</h2>
+            <div className={styles.formGrid}>
+              <label className={styles.field}>
+                <span>ชื่อผู้รีวิว *</span>
+                <input required value={reviewForm.customer_name} onChange={e => setReviewForm({...reviewForm, customer_name: e.target.value})}
+                  placeholder="เช่น คุณสมศักดิ์ ด." className={styles.input} />
+              </label>
+              <label className={styles.field}>
+                <span>คะแนนรีวิว *</span>
+                <select required value={reviewForm.rating} onChange={e => setReviewForm({...reviewForm, rating: Number(e.target.value)})} className={styles.input}>
+                  <option value={5}>5 ดาว</option>
+                  <option value={4}>4 ดาว</option>
+                  <option value={3}>3 ดาว</option>
+                  <option value={2}>2 ดาว</option>
+                  <option value={1}>1 ดาว</option>
+                </select>
+              </label>
+              <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span>ลิงก์โพสต์เฟสบุ๊ค / หน้าโปรไฟล์ Facebook (เพื่อความโปร่งใสตรวจสอบได้)</span>
+                <input value={reviewForm.facebook_url} onChange={e => setReviewForm({...reviewForm, facebook_url: e.target.value})}
+                  placeholder="เช่น https://facebook.com/posts/12345" className={styles.input} />
+              </label>
+              <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span>ลิงก์รูปภาพ Avatar / โลโก้ผู้ใช้งาน</span>
+                <input value={reviewForm.avatar_url} onChange={e => setReviewForm({...reviewForm, avatar_url: e.target.value})}
+                  placeholder="เช่น https://api.dicebear.com/7.x/adventurer/svg?seed=name" className={styles.input} />
+              </label>
+              <label className={`${styles.field} ${styles.fullWidth}`}>
+                <span>ข้อความรีวิว</span>
+                <textarea required value={reviewForm.comment} onChange={e => setReviewForm({...reviewForm, comment: e.target.value})}
+                  placeholder="ข้อความรีวิวประทับใจ..." rows={3} className={styles.input} />
+              </label>
+            </div>
+            <div className={styles.formActions}>
+              <button type="submit" className={styles.submitBtn} disabled={loading}>
+                {loading ? 'กำลังบันทึก...' : editingReview ? 'บันทึกการแก้ไข' : 'เพิ่มรีวิว'}
+              </button>
+              {editingReview && (
+                <button type="button" className={styles.cancelBtn}
+                  onClick={() => { setEditingReview(null); setReviewForm(EMPTY_REVIEW_FORM); setTab('reviews') }}>
                   ยกเลิก
                 </button>
               )}
@@ -712,25 +928,21 @@ export default function AdminDashboard() {
         {/* Orders Table */}
         {tab === 'orders' && (
           <div className={styles.tableWrap}>
-            <p className={styles.orderNote}>
-              * รายการ Order ต้องเพิ่มผ่านหลังบ้านหลังแชทกับลูกค้าเพื่อใช้บริการค้นหาสถานะ
-            </p>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th>สินค้า</th>
                   <th>เบอร์โทร</th>
                   <th>ชื่อ</th>
-                  <th>วันที่</th>
+                  <th>รูปพัสดุ</th>
                   <th>สถานะ</th>
-                  <th>เลขพัสดุ</th>
                   <th>จัดการ</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center' }} className={styles.tdMuted}>
+                    <td colSpan={6} style={{ textAlign: 'center' }} className={styles.tdMuted}>
                       ไม่มีรายการคำสั่งซื้อ
                     </td>
                   </tr>
@@ -742,8 +954,12 @@ export default function AdminDashboard() {
                         <td className={styles.tdName}>{productInfo.title || productInfo.name || '—'}</td>
                         <td className={styles.tdPhone}>{o.customer_phone}</td>
                         <td>{o.customer_name || '—'}</td>
-                        <td className={styles.tdMuted}>
-                          {new Date(o.created_at || o.updated_at).toLocaleDateString('th-TH')}
+                        <td>
+                          {o.delivery_image_url ? (
+                            <img src={o.delivery_image_url} alt="parcel" className={styles.tableThumb} style={{ borderRadius: '4px' }} />
+                          ) : (
+                            <span className={styles.tdMuted}>ไม่มีรูป</span>
+                          )}
                         </td>
                         <td>
                           <select
@@ -756,7 +972,6 @@ export default function AdminDashboard() {
                             <option value="delivered">จัดส่งสำเร็จ</option>
                           </select>
                         </td>
-                        <td className={styles.tdMuted}>{o.tracking_number || '—'}</td>
                         <td>
                           <div className={styles.actions}>
                             <button onClick={() => startOrderEdit(o)} className={styles.editBtn}>แก้ไข</button>
@@ -766,6 +981,57 @@ export default function AdminDashboard() {
                       </tr>
                     )
                   })
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Reviews Table */}
+        {tab === 'reviews' && (
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th>ชื่อ</th>
+                  <th>คะแนน</th>
+                  <th>ความเห็น</th>
+                  <th>Facebook ลิงก์</th>
+                  <th>จัดการ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reviews.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ textAlign: 'center' }} className={styles.tdMuted}>
+                      ไม่มีรายการรีวิว
+                    </td>
+                  </tr>
+                ) : (
+                  reviews.map(r => (
+                    <tr key={r.id}>
+                      <td className={styles.tdName}>{r.customer_name}</td>
+                      <td>{'★'.repeat(r.rating || 5)}</td>
+                      <td className={styles.tdMuted} style={{ maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {r.comment}
+                      </td>
+                      <td className={styles.tdMuted}>
+                        {r.facebook_url ? (
+                          <a href={r.facebook_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+                            ลิงก์เฟสบุ๊ค
+                          </a>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                      <td>
+                        <div className={styles.actions}>
+                          <button onClick={() => startReviewEdit(r)} className={styles.editBtn}>แก้ไข</button>
+                          <button onClick={() => handleDeleteReview(r.id)} className={styles.deleteBtn}>ลบ</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>

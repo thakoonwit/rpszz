@@ -30,7 +30,8 @@
 
 @media (min-width: 992px) {
   .heroGrid {
-    grid-template-columns: 1.2fr 1fr;
+    grid-template-columns: 1.25fr 1fr;
+    gap: 64px;
   }
 }
 
@@ -44,41 +45,42 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--primary);
-  background: oklch(0.95 0.02 258);
-  border: 1px solid var(--border);
-  padding: 6px 16px;
-  border-radius: var(--radius-full);
-  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 
 .pingDot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background-color: var(--accent);
 }
 
 .heroTitle {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-size: clamp(2rem, 5.5vw, 3.8rem);
   font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
   color: var(--ink);
+  text-transform: uppercase;
 }
 
 .heroTitleHighlight {
   color: var(--accent);
+  background: linear-gradient(to right, var(--accent), oklch(0.55 0.15 15));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .heroSub {
   font-size: 0.95rem;
   color: var(--muted);
-  line-height: 1.7;
-  max-width: 540px;
+  line-height: 1.8;
+  max-width: 520px;
 }
 
 .heroActions {
@@ -89,39 +91,42 @@
 }
 
 .heroActions .primaryBtn {
-  padding: 12px 28px;
+  padding: 14px 30px;
   font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   background-color: var(--ink);
   color: #ffffff;
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
-  box-shadow: var(--shadow-premium);
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--ink);
 }
 
 .heroActions .primaryBtn:hover {
-  background-color: oklch(0.25 0.01 258);
-  transform: translateY(-1px);
+  background-color: transparent;
+  color: var(--ink);
 }
 
 .heroActions .secondaryBtn {
-  padding: 12px 28px;
+  padding: 14px 30px;
   font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  background-color: var(--surface);
+  background-color: transparent;
   color: var(--ink);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
 }
 
 .heroActions .secondaryBtn:hover {
   border-color: var(--ink);
-  background-color: var(--bg);
 }
 
 /* Quick Trust Stats */
@@ -136,7 +141,7 @@
 
 .statNum {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 900;
   color: var(--ink);
   line-height: 1;
@@ -151,12 +156,12 @@
 }
 
 .statLabel {
-  font-size: 0.65rem;
-  font-weight: 600;
+  font-size: 0.6rem;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--muted);
-  letter-spacing: 0.05em;
-  margin-top: 4px;
+  letter-spacing: 0.08em;
+  margin-top: 6px;
 }
 
 /* Spotlight Card Right Side */
@@ -165,8 +170,13 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: var(--space-md);
-  box-shadow: var(--shadow-premium);
+  box-shadow: var(--shadow-sm);
   position: relative;
+  transition: all var(--transition-normal);
+}
+
+.spotlightCard:hover {
+  box-shadow: var(--shadow-premium);
 }
 
 .spotlightHeader {
@@ -182,24 +192,22 @@
 }
 
 .spotlightDot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
 }
 
 .spotlightBadge {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
-  background-color: var(--accent-muted);
-  color: var(--accent);
-  padding: 3px 8px;
-  border-radius: 4px;
-  letter-spacing: 0.05em;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .spotlightImageWrap {
   width: 100%;
-  height: 220px;
+  height: 240px;
   overflow: hidden;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border);
@@ -220,41 +228,39 @@
 }
 
 .spotlightCategory {
-  font-size: 9px;
-  font-weight: 700;
+  font-size: 8px;
+  font-weight: 800;
   text-transform: uppercase;
   color: var(--primary);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .spotlightTitle {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: var(--ink);
+  margin-top: 2px;
 }
 
 .spotlightPriceWrap {
   text-align: right;
 }
 
-.spotlightOldPrice {
-  font-size: 0.75rem;
-  text-decoration: line-through;
-  color: var(--muted);
-  display: block;
-}
-
 .spotlightPrice {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 900;
   color: var(--accent);
 }
 
 .spotlightDesc {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--muted);
   line-height: 1.6;
   margin-bottom: var(--space-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .spotlightBuyBtn {
@@ -262,7 +268,7 @@
   padding: 12px;
   background-color: var(--ink);
   color: #ffffff;
-  border: none;
+  border: 1px solid var(--ink);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -277,7 +283,8 @@
 }
 
 .spotlightBuyBtn:hover {
-  background-color: oklch(0.25 0.01 258);
+  background-color: transparent;
+  color: var(--ink);
 }
 
 /* Condition Standards Section */
@@ -289,10 +296,10 @@
 
 .sectionHeading {
   text-align: center;
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.7rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   color: var(--muted);
   margin-bottom: var(--space-md);
 }
@@ -326,11 +333,12 @@
 
 .conditionBox:hover {
   border-color: var(--ink);
+  background-color: var(--surface);
 }
 
 .conditionGrade {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 900;
   display: block;
   margin-bottom: 4px;
 }
@@ -369,7 +377,7 @@
 .catalogTagline {
   font-size: 0.65rem;
   color: var(--accent);
-  font-weight: 750;
+  font-weight: 800;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   display: block;
@@ -378,14 +386,14 @@
 
 .catalogTitle {
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   font-weight: 900;
   text-transform: uppercase;
   color: var(--ink);
 }
 
 .catalogTitleDivider {
-  width: 48px;
+  width: 36px;
   height: 4px;
   background-color: var(--ink);
   margin: 12px auto 0 auto;
@@ -416,6 +424,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    padding: 12px 20px;
   }
 }
 
@@ -426,23 +435,14 @@
 
 @media (min-width: 992px) {
   .searchWrapper {
-    max-width: 280px;
+    max-width: 240px;
   }
-}
-
-.searchIcon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted);
-  font-size: 0.75rem;
 }
 
 .toolbarSearch {
   width: 100%;
-  padding: 10px 14px 10px 36px;
-  background-color: var(--surface);
+  padding: 10px 16px;
+  background-color: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   font-size: 0.75rem;
@@ -453,6 +453,7 @@
 .toolbarSearch:focus {
   outline: none;
   border-color: var(--ink);
+  background-color: var(--surface);
 }
 
 .tabs {
@@ -471,7 +472,7 @@
 
 .tabBtn {
   padding: 8px 16px;
-  background-color: var(--bg);
+  background-color: transparent;
   border: 1px solid transparent;
   color: var(--muted);
   font-size: 0.7rem;
@@ -481,14 +482,10 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .tabBtn:hover {
   color: var(--ink);
-  background-color: var(--border);
 }
 
 .activeTabBtn {
@@ -514,7 +511,7 @@
 .sorterSelect {
   width: 100%;
   padding: 10px 14px;
-  background-color: var(--surface);
+  background-color: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--muted);
@@ -546,7 +543,7 @@
 
 @media (min-width: 992px) {
   .grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
@@ -565,8 +562,8 @@
 }
 
 .loadingSpinner {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 2.5px solid var(--border);
   border-top-color: var(--ink);
   border-radius: 50%;
@@ -577,7 +574,7 @@
 .emptyTitle {
   font-weight: 800;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--ink);
   letter-spacing: 0.05em;
   margin-top: var(--space-xs);
@@ -628,11 +625,11 @@
   color: var(--primary);
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
 }
 
 .testimonialsTitle {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 900;
   text-transform: uppercase;
   color: var(--ink);
@@ -643,7 +640,7 @@
   background-color: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  padding: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -693,14 +690,6 @@
   box-shadow: var(--shadow-premium);
 }
 
-.testimonialIcon {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  color: oklch(0.92 0 0);
-  font-size: 1.8rem;
-}
-
 .testimonialUserArea {
   display: flex;
   align-items: center;
@@ -709,20 +698,12 @@
 }
 
 .userAvatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #ffffff;
+  object-fit: cover;
+  border: 1px solid var(--border);
 }
-
-.avatarRed { background-color: var(--accent); }
-.avatarBlue { background-color: var(--primary); }
-.avatarBlack { background-color: var(--ink); }
 
 .userMeta {
   display: flex;
@@ -735,26 +716,13 @@
   color: var(--ink);
 }
 
-.userPurchase {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-}
-
-.userPurchaseAlt {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--primary);
-  text-transform: uppercase;
-}
-
 .testimonialText {
   font-size: 0.75rem;
   color: var(--muted);
   line-height: 1.6;
   position: relative;
   z-index: 2;
+  white-space: pre-line;
 }
 
 /* Newsletter Registration Section */
@@ -765,7 +733,7 @@
 }
 
 .newsletterTitle {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 800;
   text-transform: uppercase;
   color: var(--ink);
@@ -775,7 +743,7 @@
 .newsletterDesc {
   font-size: 0.75rem;
   color: var(--muted);
-  max-width: 500px;
+  max-width: 480px;
   margin: 0 auto var(--space-md) auto;
   line-height: 1.6;
 }
@@ -784,7 +752,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 440px;
+  max-width: 400px;
   margin: 0 auto;
 }
 

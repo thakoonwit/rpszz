@@ -4,7 +4,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import styles from './HomePage.module.css'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import { Store, Info, Star, Award, ShieldCheck, Mail, Eye, ShoppingBag } from 'lucide-react'
+import { Store, Info, Star, Facebook, Eye, ArrowRight, ShieldCheck, ThumbsUp } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
 
 const CATEGORY_TABS = [
@@ -46,51 +46,31 @@ const FALLBACK_PRODUCTS = [
     image_url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80',
     status: 'sold',
     category: 'electronics'
-  },
-  {
-    id: '4',
-    title: 'Graphic Streetwear Tee',
-    name: 'Graphic Streetwear Tee',
-    description: 'เสื้อยืดสไตล์สตรีทแวร์ฟิล์มลายกราฟิกสวย 88% ผ้าคอนตอนเนื้อหนา ไซส์ L',
-    price: 450,
-    image_url: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=80',
-    status: 'available',
-    category: 'clothing'
   }
 ]
 
-const TESTIMONIALS = [
+const FALLBACK_REVIEWS = [
   {
-    id: '1',
+    id: 'r1',
     customer_name: 'คุณอมรเทพ ส.',
     rating: 5,
-    comment: 'สภาพสินค้าตรงปกมากครับ ทางร้านถ่ายรูปมุมซูมรายละเอียดจุดรอยขนแมวมาแบบชัดเจน ซื่อสัตย์มาก ไม่ปกปิดตำหนิเลย มั่นใจร้านนี้ครับ',
-    avatar: 'A',
-    purchase: 'กล้อง Analog Film Camera',
-    theme: 'avatarBlack'
+    comment: 'สภาพกล้องสวยถูกใจตามในรูปเป๊ะครับ ทางร้านถ่ายภาพมุมซูมรายละเอียดจุดรอยขนแมวมาแบบชัดเจน ซื่อสัตย์มาก ไม่ปกปิดตำหนิเลย มั่นใจร้านนี้ครับ',
+    facebook_url: 'https://facebook.com',
+    avatar_url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=anan'
   },
   {
-    id: '2',
+    id: 'r2',
     customer_name: 'คุณภัทราภรณ์ ว.',
     rating: 5,
     comment: 'แจ็คเก็ตสะอาดมาก ไม่มีกลิ่นอับชื้นเหมือนเสื้อผ้ามือสองทั่วไป ส่งซักแห้งฆ่าเชื้อมาให้เรียบร้อย สภาพดีงามขนฟูสวยตามที่ลงรายละเอียดไว้เลยค่ะ',
-    avatar: 'P',
-    purchase: 'Vintage Denim Jacket',
-    theme: 'avatarRed'
-  },
-  {
-    id: '3',
-    customer_name: 'คุณศตวรรษ ล.',
-    rating: 5,
-    comment: 'ได้ของแถมครบตามที่ระบุ แพ็คกันกระแทกมาหนาหนาแน่นหลายชั้นมาก ตัวเครื่องใช้งานได้ดีไม่มีปัญหา ส่งผ่านเอกชนวันเดียวถึงเลย ขอบคุณครับ',
-    avatar: 'S',
-    purchase: 'Retro Leather Boots',
-    theme: 'avatarBlue'
+    facebook_url: 'https://facebook.com',
+    avatar_url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=sompong'
   }
 ]
 
 export default function Home() {
   const [products, setProducts] = useState([])
+  const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
@@ -100,14 +80,15 @@ export default function Home() {
   const hasConvex = !!import.meta.env.VITE_CONVEX_URL
 
   const convexProducts = useQuery(hasConvex ? api.products.list : api.products.list)
+  const convexReviews = useQuery(hasConvex ? api.reviews.list : api.reviews.list)
 
   const fetchData = async (showLoading = true) => {
     if (showLoading) setLoading(true)
     try {
-      const { data: dbProducts, error: prodError } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false })
+      const [{ data: dbProducts, error: prodError }, { data: dbReviews, error: revError }] = await Promise.all([
+        supabase.from('products').select('*').order('created_at', { ascending: false }),
+        supabase.from('reviews').select('*').order('created_at', { ascending: false })
+      ])
 
       if (prodError || !dbProducts || dbProducts.length === 0) {
         const localProds = localStorage.getItem('rpszz_local_products')
@@ -119,21 +100,35 @@ export default function Home() {
       } else {
         setProducts(dbProducts)
       }
+
+      if (revError || !dbReviews || dbReviews.length === 0) {
+        const localRevs = localStorage.getItem('rpszz_local_reviews')
+        if (localRevs) {
+          setReviews(JSON.parse(localRevs))
+        } else {
+          setReviews(FALLBACK_REVIEWS)
+        }
+      } else {
+        setReviews(dbReviews)
+      }
     } catch (err) {
       console.error('Error fetching data:', err)
       const localProds = localStorage.getItem('rpszz_local_products')
       setProducts(localProds ? JSON.parse(localProds) : FALLBACK_PRODUCTS)
+      const localRevs = localStorage.getItem('rpszz_local_reviews')
+      setReviews(localRevs ? JSON.parse(localRevs) : FALLBACK_REVIEWS)
     } finally {
       if (showLoading) setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (hasConvex && convexProducts) {
+    if (hasConvex && convexProducts && convexReviews) {
       setProducts(convexProducts.map(p => ({ ...p, id: p._id })))
+      setReviews(convexReviews.map(r => ({ ...r, id: r._id })))
       setLoading(false)
     }
-  }, [convexProducts, hasConvex])
+  }, [convexProducts, convexReviews, hasConvex])
 
   useEffect(() => {
     if (!hasConvex) {
@@ -156,7 +151,6 @@ export default function Home() {
     const desc = p.description || ''
     const match = desc.match(/(\d+)%/)
     if (match) return parseInt(match[1])
-    // Determinisitc mock score for display
     const numId = p.id ? p.id.toString().charCodeAt(0) : 95
     return 85 + (numId % 14)
   }
@@ -179,18 +173,12 @@ export default function Home() {
       if (sortBy === 'condition-rank') {
         return getConditionScore(b) - getConditionScore(a)
       }
-      return 0 // default sorting
+      return 0
     })
 
   // Find spotlight product
   const spotlightProduct = products.find(p => p.status === 'available' && p.image_url) || products[0] || FALLBACK_PRODUCTS[0]
   const spotlightImage = spotlightProduct?.image_url ? spotlightProduct.image_url.split(',')[0].trim() : ''
-
-  const counts = {
-    available: products.filter(p => p.status === 'available').length,
-    reserved:  products.filter(p => p.status === 'reserved').length,
-    sold:      products.filter(p => p.status === 'sold').length,
-  }
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault()
@@ -207,63 +195,62 @@ export default function Home() {
       <Toaster />
       <div className={styles.heroAccentLine} />
 
-      {/* Hero */}
+      {/* Hero: Boutique Editorial Grid */}
       <section className={styles.hero}>
         <div className="container">
           <div className={styles.heroGrid}>
             
-            {/* Left Info Column */}
+            {/* Left Column: Bold Asymmetric Typography */}
             <div className={styles.heroContent}>
               <div className={styles.tagline}>
                 <span className={`${styles.pingDot} animate-pulse`} />
-                อัปเดตสต็อกสินค้าใหม่: วันนี้เวลา 18:00 น.
+                RPSZZ / ARCHIVE COLLECTIBLES
               </div>
               
               <h1 className={styles.heroTitle}>
-                CURATED <span className={styles.heroTitleHighlight}>SECONDS</span><br />
-                คัดเกรดเฉพาะสิ่งที่มีคุณค่า
+                THE EDITORIAL <br />
+                <span className={styles.heroTitleHighlight}>ARCHIVE</span> OF VINTAGE
               </h1>
               
               <p className={styles.heroSub}>
-                พบกับแหล่งรวบรวมของมือสองระดับพรีเมียม เสื้อผ้า สินค้าเทคโนโลยี และนาฬิกาสะสมยอดนิยม ทุกชิ้นได้รับการตรวจสอบอย่างพิถีพิถัน วัดสภาพจริงระบุเปอร์เซ็นต์อย่างจริงใจ เพื่อให้คุณมั่นใจในทุกการสั่งซื้อเสมือนไปเลือกซื้อเอง
+                คอลเลกชันเสื้อผ้า ของใช้สะสม และแกดเจ็ตวินเทจคัดเกรดพิเศษโดย Rapeepong ทุกชิ้นผ่านการตรวจสอบคุณภาพ บันทึกตำหนิและประเมินเปอร์เซ็นต์ความสมบูรณ์แบบตรงไปตรงมา สั่งซื้อจองสินค้าผ่านทางแชทเท่านั้น
               </p>
 
               <div className={styles.heroActions}>
                 <a href="#shop-section" className={styles.primaryBtn}>
-                  <Store size={14} style={{ marginRight: '6px' }} /> เลือกชมสินค้าเลย
+                  <Store size={14} style={{ marginRight: '8px' }} /> เลือกชมสินค้าทั้งหมด
                 </a>
                 <a href="#conditions-section" className={styles.secondaryBtn}>
-                  <Info size={14} style={{ marginRight: '6px' }} /> เกณฑ์วัดสภาพสินค้า
+                  <Info size={14} style={{ marginRight: '8px' }} /> มาตรฐานสภาพสินค้า
                 </a>
               </div>
 
-              {/* Quick Stats */}
+              {/* Trust badges */}
               <div className={styles.quickStats}>
                 <div>
                   <div className={styles.statNum}>100%</div>
-                  <div className={styles.statLabel}>ภาพถ่ายจริง</div>
+                  <div className={styles.statLabel}>REAL CAPTURES</div>
                 </div>
                 <div>
-                  <div className={`${styles.statNum} ${styles.statNumAccent}`}>1 of 1</div>
-                  <div className={styles.statLabel}>ชิ้นเดียวในร้าน</div>
+                  <div className={`${styles.statNum} ${styles.statNumAccent}`}>LIMITED</div>
+                  <div className={styles.statLabel}>1-OF-1 SELECTIONS</div>
                 </div>
                 <div>
-                  <div className={`${styles.statNum} ${styles.statNumPrimary}`}>Verified</div>
-                  <div className={styles.statLabel}>ตรวจสอบของแท้</div>
+                  <div className={`${styles.statNum} ${styles.statNumPrimary}`}>VERIFIED</div>
+                  <div className={styles.statLabel}>AUTHENTIC PIECES</div>
                 </div>
               </div>
             </div>
 
-            {/* Right Spotlight Card */}
+            {/* Right Column: Floating Curated Showcase */}
             {spotlightProduct && (
               <div className={styles.spotlightCard}>
                 <div className={styles.spotlightHeader}>
+                  <span className={styles.spotlightBadge}>WEEKLY SPOTLIGHT</span>
                   <div className={styles.spotlightDots}>
                     <span className={styles.spotlightDot} style={{ backgroundColor: 'var(--accent)' }} />
                     <span className={styles.spotlightDot} style={{ backgroundColor: 'var(--ink)' }} />
-                    <span className={styles.spotlightDot} style={{ backgroundColor: 'var(--primary)' }} />
                   </div>
-                  <span className={styles.spotlightBadge}>SPOTLIGHT DEALS</span>
                 </div>
                 
                 <div className={styles.spotlightImageWrap}>
@@ -282,9 +269,6 @@ export default function Home() {
                     <h3 className={styles.spotlightTitle}>{spotlightProduct.title || spotlightProduct.name}</h3>
                   </div>
                   <div className={styles.spotlightPriceWrap}>
-                    {spotlightProduct.price > 1000 && (
-                      <span className={styles.spotlightOldPrice}>฿{(spotlightProduct.price * 1.5).toLocaleString()}</span>
-                    )}
                     <span className={styles.spotlightPrice}>฿{Number(spotlightProduct.price || 0).toLocaleString()}</span>
                   </div>
                 </div>
@@ -297,7 +281,7 @@ export default function Home() {
                   rel="noreferrer"
                   className={styles.spotlightBuyBtn}
                 >
-                  <ShoppingBag size={14} /> สั่งซื้อสินค้านี้ทันที
+                  <ArrowRight size={14} /> แชทจองชิ้นนี้ทันที
                 </a>
               </div>
             )}
@@ -306,62 +290,60 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Conditions Section */}
+      {/* Conditions Standards Info Area */}
       <section className={styles.conditionsSection} id="conditions-section">
         <div className="container">
           <h3 className={styles.sectionHeading}>
-            / มาตรฐานการคัดเลือกสภาพสินค้ามือสองของเรา /
+            / ประเมินสภาพสินค้าอย่างจริงใจ /
           </h3>
           <div className={styles.conditionsGrid}>
             <div className={styles.conditionBox}>
               <span className={`${styles.conditionGrade} ${styles.gradeRed}`}>MINT</span>
-              <span className={styles.conditionTitle}>สภาพเหมือนใหม่ 98-99%</span>
-              <p className={styles.conditionDesc}>สินค้าแทบไม่มีตำหนิ ครบกล่อง ไม่เคยผ่านการซ่อมแซมหรือเสียหาย ใช้งานได้สมบูรณ์แบบเสมือนถอยห้าง</p>
+              <span className={styles.conditionTitle}>98 - 99% เสมือนมือหนึ่ง</span>
+              <p className={styles.conditionDesc}>สินค้าไร้ริ้วรอย ตำหนิเป็นศูนย์ ครบกล่องสมบูรณ์แบบที่สุด</p>
             </div>
             <div className={styles.conditionBox}>
               <span className={`${styles.conditionGrade} ${styles.gradeBlue}`}>EXCELLENT</span>
-              <span className={styles.conditionTitle}>สภาพดีเยี่ยม 94-97%</span>
-              <p className={styles.conditionDesc}>มีริ้วรอยขนแมวบางๆ ตามธรรมชาติจากการใช้งานทั่วไป อุปกรณ์และการทำงานหลักทุกอย่างไม่มีปัญหาแม้แต่น้อย</p>
+              <span className={styles.conditionTitle}>94 - 97% สภาพดีเยี่ยม</span>
+              <p className={styles.conditionDesc}>มีรอยขนแมวบางๆ สภาพโดยรวมงดงาม ระบบทำงานไร้ที่ติ</p>
             </div>
             <div className={styles.conditionBox}>
               <span className={`${styles.conditionGrade} ${styles.gradeBlack}`}>VERY GOOD</span>
-              <span className={styles.conditionTitle}>สภาพดีมาก 90-93%</span>
-              <p className={styles.conditionDesc}>มีรอยจากการใช้งานชัดเจน แต่ไม่มีผลกระทบต่อประสิทธิภาพการใช้งาน ภาพถ่ายจากสตูดิโอจะซูมตำแหน่งจุดรอยชัดเจน</p>
+              <span className={styles.conditionTitle}>90 - 93% สภาพพร้อมใช้</span>
+              <p className={styles.conditionDesc}>รอยจากการใช้งานชัดเจน แต่ใช้งานและสวมใส่ได้ดีเยี่ยม</p>
             </div>
             <div className={styles.conditionBox}>
-              <span className={`${styles.conditionGrade} ${styles.gradeMuted}`}>VINTAGE GOOD</span>
-              <span className={styles.conditionTitle}>สภาพวินเทจ 85-89%</span>
-              <p className={styles.conditionDesc}>เหมาะกับสายสะสม มีรอยเฟด รอยซีด รอยยับตามกาลเวลาที่สวยงามเป็นเอกลักษณ์แบบหาที่ไหนไม่ได้อีกแล้ว</p>
+              <span className={`${styles.conditionGrade} ${styles.gradeMuted}`}>VINTAGE</span>
+              <span className={styles.conditionTitle}>85 - 89% สภาพวินเทจ</span>
+              <p className={styles.conditionDesc}>รอยเฟดหรือรอยซีดตามกาลเวลาที่สร้างเสน่ห์เฉพาะตัว</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Shop Catalog Section */}
+      {/* Catalog Grid Section */}
       <section className={styles.catalogSection} id="shop-section">
         <div className="container">
           
           <div className={styles.catalogHeadingArea}>
-            <span className={styles.catalogTagline}>OUR CATALOGUE</span>
-            <h2 className={styles.catalogTitle}>CURATED SECOND-HAND SELECTIONS</h2>
+            <span className={styles.catalogTagline}>THE COLLECTION</span>
+            <h2 className={styles.catalogTitle}>CURATED PIECES</h2>
             <div className={styles.catalogTitleDivider} />
-            <p className={styles.catalogSub}>ของใช้ส่วนตัว วินเทจไอเทม และแบรนด์เนมมือสองของแท้ ทุกชิ้นมีสต็อกอย่างละ 1 ชิ้นเท่านั้น ขายแล้วขายเลยไม่มีเติมสต็อก</p>
+            <p className={styles.catalogSub}>สินค้าส่วนตัวและของแบรนด์เนมวินเทจคัดพิเศษ สต็อกอย่างละ 1 ชิ้น ไม่มีชิ้นที่สองทดแทน</p>
           </div>
 
-          {/* Toolbar */}
+          {/* Catalog Filters Bar */}
           <div className={styles.toolbar}>
-            {/* Search */}
             <div className={styles.searchWrapper}>
               <input 
                 type="text" 
-                placeholder="ค้นหาสินค้ามือสอง..."
+                placeholder="ค้นหาตามชื่อ หรือแบรนด์..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className={styles.toolbarSearch}
               />
             </div>
 
-            {/* Category Tabs */}
             <div className={styles.tabs}>
               {CATEGORY_TABS.map(tab => (
                 <button
@@ -374,17 +356,16 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Sorter */}
             <div className={styles.sorterWrapper}>
               <select 
                 value={sortBy} 
                 onChange={e => setSortBy(e.target.value)}
                 className={styles.sorterSelect}
               >
-                <option value="default">จัดเรียงรายการสินค้า</option>
+                <option value="default">จัดเรียงสินค้า</option>
                 <option value="low-high">ราคา: ต่ำไปสูง</option>
                 <option value="high-low">ราคา: สูงไปต่ำ</option>
-                <option value="condition-rank">สภาพสินค้าดีที่สุด</option>
+                <option value="condition-rank">สภาพความสมบูรณ์สูงสุด</option>
               </select>
             </div>
           </div>
@@ -393,13 +374,13 @@ export default function Home() {
           {loading ? (
             <div className={styles.loadingArea}>
               <div className={styles.loadingSpinner} />
-              <span>กำลังโหลดสินค้าที่คัดสรรแล้ว...</span>
+              <span>กำลังโหลดสินค้าคัดสรร...</span>
             </div>
           ) : filteredAndSortedProducts.length === 0 ? (
             <div className={styles.emptyArea}>
               <Eye size={36} style={{ color: 'var(--muted)' }} />
-              <div className={styles.emptyTitle}>ไม่พบสินค้าที่คุณต้องการ</div>
-              <p className={styles.emptySub}>ลองเปลี่ยนคำค้นหา หรือเลือกดูหมวดหมู่อื่นแทน</p>
+              <div className={styles.emptyTitle}>ไม่พบสินค้าที่ค้นหา</div>
+              <p className={styles.emptySub}>กรุณาลองเปลี่ยนคำค้นหา หรือคัดกรองหมวดหมู่อื่นแทน</p>
             </div>
           ) : (
             <div className={styles.grid}>
@@ -412,58 +393,93 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Customer Testimonials with Facebook Links */}
       <section className={styles.testimonialsSection}>
         <div className="container">
           
           <div className={styles.testimonialsHeader}>
             <div className={styles.testimonialsTitleArea}>
-              <span className={styles.testimonialsTagline}>REAL FEEDBACKS</span>
-              <h2 className={styles.testimonialsTitle}>รีวิวจากผู้สั่งซื้อสินค้ามือสองจริง</h2>
+              <span className={styles.testimonialsTagline}>VERIFIED REVIEWS</span>
+              <h2 className={styles.testimonialsTitle}>รีวิวและเสียงตอบรับจริงจากลูกค้า</h2>
             </div>
             
             <div className={styles.ratingCard}>
               <div className={styles.ratingStars}>
-                <Star size={12} fill="var(--accent)" />
-                <Star size={12} fill="var(--accent)" />
-                <Star size={12} fill="var(--accent)" />
-                <Star size={12} fill="var(--accent)" />
-                <Star size={12} fill="var(--accent)" />
+                <Star size={12} fill="var(--accent)" stroke="none" />
+                <Star size={12} fill="var(--accent)" stroke="none" />
+                <Star size={12} fill="var(--accent)" stroke="none" />
+                <Star size={12} fill="var(--accent)" stroke="none" />
+                <Star size={12} fill="var(--accent)" stroke="none" />
               </div>
               <div>
-                <div className={styles.ratingInfoTitle}>คะแนนความพึงพอใจ 4.9 เต็ม 5.0</div>
-                <div className={styles.ratingInfoSub}>(จากรายการรับสินค้าไปแล้ว 250+ ออเดอร์)</div>
+                <div className={styles.ratingInfoTitle}>รับประกันความโปร่งใส 100%</div>
+                <div className={styles.ratingInfoSub}>สามารถคลิกตรวจสอบโพสต์รีวิวจาก Facebook จริงได้</div>
               </div>
             </div>
           </div>
 
           <div className={styles.testimonialsGrid}>
-            {TESTIMONIALS.map(item => (
-              <div key={item.id} className={styles.testimonialCard}>
-                <div className={styles.testimonialUserArea}>
-                  <div className={`${styles.userAvatar} ${styles[item.theme]}`}>
-                    {item.avatar}
+            {reviews.length === 0 ? (
+              <div className="text-center w-full" style={{ gridColumn: '1 / -1', color: 'var(--muted)', padding: '40px 0' }}>ยังไม่มีข้อเสนอแนะที่ส่งมาขณะนี้</div>
+            ) : (
+              reviews.map(item => (
+                <div key={item.id} className={styles.testimonialCard}>
+                  <div className={styles.testimonialUserArea}>
+                    <img 
+                      src={item.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${item.customer_name}`} 
+                      alt={item.customer_name} 
+                      className={styles.userAvatar} 
+                      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                    />
+                    <div className={styles.userMeta}>
+                      <span className={styles.userName}>{item.customer_name}</span>
+                      
+                      {/* Facebook verified link */}
+                      {item.facebook_url ? (
+                        <a 
+                          href={item.facebook_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="flex items-center" 
+                          style={{ 
+                            fontSize: '11px', 
+                            color: '#1877F2', 
+                            fontWeight: '600', 
+                            display: 'inline-flex',
+                            alignItems: 'center', 
+                            gap: '4px',
+                            marginTop: '2px'
+                          }}
+                        >
+                          <Facebook size={12} fill="#1877F2" stroke="none" /> Verified Profile
+                        </a>
+                      ) : (
+                        <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Verified Buyer</span>
+                      )}
+                    </div>
                   </div>
-                  <div className={styles.userMeta}>
-                    <span className={styles.userName}>{item.customer_name}</span>
-                    <span className={item.id === '2' ? styles.userPurchase : styles.userPurchaseAlt}>
-                      ซื้อ {item.purchase}
-                    </span>
+                  
+                  {/* Stars list based on rating */}
+                  <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
+                    {Array.from({ length: item.rating || 5 }).map((_, idx) => (
+                      <Star key={idx} size={10} fill="var(--accent)" stroke="none" />
+                    ))}
                   </div>
+
+                  <p className={styles.testimonialText}>"{item.comment}"</p>
                 </div>
-                <p className={styles.testimonialText}>"{item.comment}"</p>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
         </div>
       </section>
 
-      {/* Newsletter early access section */}
+      {/* Newsletter Early access email subscription form */}
       <section className={styles.newsletterSection}>
         <div className="container">
-          <h3 className={styles.newsletterTitle}>ลงทะเบียนติดตามของมือสองเกรดดี</h3>
-          <p className={styles.newsletterDesc}>เนื่องจากสินค้ามือสองที่คัดคุณภาพเกรดพรีเมียมมีเพียงชิ้นเดียวเท่านั้น สมัครรับการแจ้งเตือนทางอีเมลเพื่อได้รับสิทธิ์จองก่อนใครแบบ Early-Access</p>
+          <h3 className={styles.newsletterTitle}>ลงทะเบียนคิว Early Access</h3>
+          <p className={styles.newsletterDesc}>สินค้าทุกชิ้นคัดเกรดมีเพียง 1 ชิ้นเท่านั้น สมัครรับการแจ้งเตือนพัสดุหลุดและสินค้าอัปเดตใหม่ทางอีเมลจองก่อนใคร</p>
           
           <form onSubmit={handleNewsletterSubmit} className={styles.newsletterForm}>
             <input 
@@ -474,7 +490,7 @@ export default function Home() {
               className={styles.newsletterInput}
             />
             <button type="submit" className={styles.newsletterBtn}>
-              ลงทะเบียนรับสิทธิ์
+              สมัครรับสิทธิ์จอง
             </button>
           </form>
         </div>

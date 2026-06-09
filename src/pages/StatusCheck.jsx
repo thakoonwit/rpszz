@@ -172,6 +172,17 @@ export default function StatusCheck() {
                             {order.note && (
                               <p className={styles.note}>หมายเหตุ: {order.note}</p>
                             )}
+                            {order.delivery_image_url && (
+                              <div className={styles.deliveryProofWrap}>
+                                <span className={styles.deliveryProofLabel}>รูปถ่ายพัสดุ / หลักฐานจัดส่ง:</span>
+                                <img 
+                                  src={order.delivery_image_url} 
+                                  alt="รูปถ่ายพัสดุ" 
+                                  className={styles.deliveryProofImg} 
+                                  onClick={() => window.open(order.delivery_image_url, '_blank')}
+                                />
+                              </div>
+                            )}
                           </div>
                           <div className={styles.statusWrap}>
                             <span className={styles.statusIcon} style={{ color: s.color }}>
