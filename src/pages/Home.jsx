@@ -269,18 +269,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className={styles.footer}>
-        <div className="container">
-          <p className={styles.footerLogo} style={{ display: 'flex', alignItems: 'center', justifyCenter: 'center', gap: '8px' }}>
-            <img src="/logo.png" alt="RPSZZ Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
-            <span><span style={{ color: 'var(--accent)' }}>R</span>PSZZ</span>
-          </p>
-          <p className={styles.footerSub}>สินค้าทุกชิ้นสั่งซื้อผ่านแชทเท่านั้น — ไม่มีระบบตะกร้าสินค้า</p>
-          <p className={styles.footerCopy}>© 2026 Rapeepong · Rpszz</p>
-        </div>
-      </footer>
     </main>
   )
 }
