@@ -502,9 +502,9 @@ export default function AdminDashboard() {
         const prod = products.find(p => p.id === id)
         await convex.mutation(api.products.update, {
           id,
-          name: prod.name || prod.title,
-          title: prod.title || prod.name,
-          price: prod.price,
+          name: prod.name || prod.title || "สินค้า",
+          title: prod.title || prod.name || "สินค้า",
+          price: Number(prod.price || 0),
           category: prod.category || undefined,
           image_url: prod.image_url || undefined,
           description: prod.description || undefined,
