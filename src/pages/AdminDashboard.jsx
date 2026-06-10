@@ -505,9 +505,9 @@ export default function AdminDashboard() {
           name: prod.name || prod.title,
           title: prod.title || prod.name,
           price: prod.price,
-          category: prod.category,
-          image_url: prod.image_url,
-          description: prod.description,
+          category: prod.category || undefined,
+          image_url: prod.image_url || undefined,
+          description: prod.description || undefined,
           status,
           is_hot: !!prod.is_hot
         })
@@ -540,10 +540,10 @@ export default function AdminDashboard() {
           id,
           customer_name: o.customer_name,
           customer_phone: o.customer_phone,
-          product_id: o.product_id,
-          tracking_number: o.tracking_number,
-          note: o.note,
-          delivery_image_url: o.delivery_image_url,
+          product_id: o.product_id || undefined,
+          tracking_number: o.tracking_number || undefined,
+          note: o.note || undefined,
+          delivery_image_url: o.delivery_image_url || undefined,
           status
         })
         toast.success('อัปเดตสถานะสำเร็จ')
