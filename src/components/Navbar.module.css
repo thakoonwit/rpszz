@@ -2,85 +2,68 @@
   position: sticky;
   top: 0;
   z-index: 1100;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 0.5px solid var(--border);
   transition: all 0.3s ease;
 }
 
+@media (prefers-color-scheme: dark) {
+  .nav {
+    background: rgba(17, 17, 16, 0.96);
+  }
+}
+
 .inner {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 24px;
-  height: 70px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 20px 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  height: auto;
 }
 
 .logo {
   font-family: var(--font-display);
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.3px;
   color: var(--ink);
-  line-height: 1;
+  text-decoration: none;
 }
 
-.logoImg {
-  height: 34px;
-  width: auto;
-  object-fit: contain;
-}
-
-.logoText {
-  display: flex;
-  align-items: center;
-}
-
-.logoR {
-  color: var(--primary);
+.logoDot {
+  color: var(--red);
 }
 
 .links {
   display: flex;
+  gap: 28px;
   align-items: center;
-  gap: 8px;
 }
 
 .links a {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
   color: var(--muted);
-  letter-spacing: 0em;
-  padding: 8px 16px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  text-transform: none;
+  text-decoration: none;
+  transition: color .15s;
+  padding: 0;
+  border-radius: 0;
+  background: none;
 }
 
 .links a:hover,
 .links a.active {
-  color: var(--primary);
-  background-color: var(--primary-dim);
+  color: var(--ink);
+  background: none;
 }
 
 .ctaLink {
-  padding: 9px 20px !important;
-  background: var(--primary) !important;
-  color: #ffffff !important;
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  letter-spacing: 0em;
-  transition: all 0.2s ease !important;
-  box-shadow: 0 2px 8px oklch(0.45 0.20 258 / 0.15) !important;
-}
-
-.ctaLink:hover {
-  background: oklch(0.38 0.15 258) !important;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px oklch(0.38 0.15 258 / 0.25) !important;
+  color: var(--ink) !important;
+  font-weight: 500;
+  border-bottom: 1px solid var(--ink);
 }
 
 .burger {
@@ -88,13 +71,15 @@
   flex-direction: column;
   gap: 5px;
   background: none;
+  border: none;
   padding: 4px;
+  cursor: pointer;
 }
 
 .burger span {
   display: block;
   width: 22px;
-  height: 1.5px;
+  height: 1px;
   background: var(--ink);
 }
 
@@ -104,11 +89,11 @@
   .links {
     display: none;
     position: absolute;
-    top: 70px;
+    top: 56px;
     left: 0;
     right: 0;
-    background: #ffffff;
-    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border);
     flex-direction: column;
     padding: 24px;
     gap: 16px;
@@ -117,5 +102,14 @@
 
   .links.open {
     display: flex;
+  }
+  
+  .links a {
+    display: none;
+  }
+  
+  .links a.ctaLink,
+  .links.open a {
+    display: block;
   }
 }

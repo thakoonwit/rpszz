@@ -1,8 +1,13 @@
 import { useState } from 'react'
 import styles from './ProductCard.module.css'
-import { Star, Eye, ShoppingBag, CheckSquare } from 'lucide-react'
 
 const STATUS_LABEL = {
+  available: 'Available',
+  reserved: 'Reserved',
+  sold: 'Sold',
+}
+
+const TH_STATUS_LABEL = {
   available: 'พร้อมขาย',
   reserved: 'จองแล้ว',
   sold: 'ขายแล้ว',
@@ -20,9 +25,6 @@ export default function ProductCard({ product }) {
   const hasImages = images.length > 0
   const firstImage = hasImages ? images[0] : null
 
-  // Dynamic values parsed/mocked for premium UI layout consistency
-  const originalPrice = price > 1000 ? Math.floor(price * 1.5 / 100) * 100 : null
-  
   // Calculate deterministic condition score
   const getConditionScore = () => {
     const desc = description || ''
@@ -33,126 +35,61 @@ export default function ProductCard({ product }) {
   }
   
   const score = getConditionScore()
-  
-  // Get condition grade and badge color
-  const getConditionInfo = (scoreVal) => {
-    if (scoreVal >= 98) return { label: 'MINT', badgeClass: styles.badgeBlack }
-    if (scoreVal >= 94) return { label: 'LIKE NEW', badgeClass: styles.badgeBlue }
-    if (scoreVal >= 90) return { label: 'EXCELLENT', badgeClass: styles.badgeBlack }
-    return { label: 'VINTAGE', badgeClass: styles.badgeRed }
+
+  // Get description/specs mock details based on item to display in card sub text
+  const getSubText = () => {
+    if (category === 'clothing') return 'M · Vintage · 90s'
+    if (category === 'footwear') return '42 · Good condition'
+    if (category === 'electronics') return 'Retro · Tested'
+    return '1-of-1 · Collectible'
   }
 
-  const { label: badgeLabel, badgeClass } = getConditionInfo(score)
+  const subText = getSubText()
 
-  // Mock specs list based on category
-  const getSpecs = () => {
-    if (category === 'clothing' || category === 'footwear') {
-      return [
-        'สภาพ: ซักรีดทำความสะอาดฆ่าเชื้อเรียบร้อยแล้ว',
-        'เนื้อผ้า / วัสดุ: คุณภาพพรีเมียม ถักทอละเอียด',
-        'ตำหนิ: ไม่พบตำหนิขาดหรือชำรุดเสียหาย',
-        'การจัดส่ง: แพ็คกล่องกันกระแทกอย่างดี ส่งด่วนใน 1 วัน'
-      ]
-    }
-    return [
-      'สภาพบอดี้: ทำงานปกติ 100% ผ่านการทดสอบแล้ว',
-      'อุปกรณ์ที่ได้รับ: ตัวเครื่องพร้อมใช้งานทันที',
-      'ตำหนิ: รอยขนแมวบางๆ เล็กน้อยตามอายุการใช้งาน',
-      'การรับประกัน: ประกันใจจากทางร้านให้ 15 วัน'
-    ]
+  const handleCardClick = () => {
+    setShowModal(true)
   }
 
-  const specsList = getSpecs()
+  const getBadgeClass = () => {
+    if (status === 'available') return styles.badgeAvailable
+    if (status === 'reserved') return styles.badgeReserved
+    return styles.badgeSold
+  }
 
   return (
     <>
-      <div className={`${styles.card} ${styles[status]}`}>
-        <div className={styles.imageWrap} onClick={() => setShowModal(true)} style={{ cursor: 'pointer' }}>
+      <div className={styles.card} onClick={handleCardClick}>
+        <div className={styles.imageWrap}>
           {firstImage ? (
             <img src={firstImage} alt={displayName} className={styles.image} />
           ) : (
             <div className={styles.noImage}>
-              <span>ไม่มีรูป</span>
+              <i className="ti ti-shirt" aria-hidden="true" />
             </div>
           )}
           
-          {/* Badge overlays */}
-          <span className={`${styles.badge} ${badgeClass}`}>
-            {badgeLabel}
+          <span className={`${styles.badge} ${getBadgeClass()}`}>
+            {STATUS_LABEL[status] || status}
           </span>
-          <span className={styles.conditionTag}>
-            สภาพ {score}%
-          </span>
-
-          {/* Quick Action Overlay on hover */}
-          <div className={styles.overlay}>
-            <button className={styles.overlayBtn} onClick={() => setShowModal(true)}>
-              <Eye size={12} /> ตรวจสภาพเครื่องอย่างละเอียด
-            </button>
-          </div>
         </div>
 
         <div className={styles.body}>
-          <div className={styles.categoryRow}>
-            <span className={styles.category}>
-              {category === 'clothing' ? 'เสื้อผ้า' : category === 'footwear' ? 'รองเท้า' : category === 'electronics' ? 'อิเล็กทรอนิกส์' : category === 'accessories' ? 'เครื่องประดับ' : category || 'สินค้า'}
-            </span>
-            <span className={styles.statusText}>
-              {status === 'available' ? 'In Stock' : STATUS_LABEL[status]}
-            </span>
-          </div>
-
-          <h3 className={styles.name} onClick={() => setShowModal(true)} style={{ cursor: 'pointer' }}>
-            {displayName}
-          </h3>
-          
-          {description && (
-            <p className={styles.desc}>{description}</p>
-          )}
-
-          {/* Price information */}
-          <div className={styles.priceSection}>
-            <div>
-              <span className={styles.priceLabel}>ราคาพิเศษ</span>
-              <div className={styles.priceRow}>
-                <span className={styles.price}>
-                  ฿{Number(price).toLocaleString()}
-                </span>
-                {originalPrice && (
-                  <span className={styles.originalPrice}>
-                    ฿{originalPrice.toLocaleString()}
-                  </span>
-                )}
-              </div>
-            </div>
-            
-            <div className={styles.ratingSection}>
-              <span className={styles.starRating}>
-                <Star size={10} fill="var(--accent)" stroke="none" /> 4.9
-              </span>
-              <span className={styles.collectibleText}>ของคัดสะสม</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className={styles.cardActions}>
-            <button 
-              onClick={() => setShowModal(true)} 
-              className={styles.detailsBtn}
-            >
-              ดูข้อมูลตำหนิ
-            </button>
+          <p className={styles.name}>{displayName}</p>
+          <p className={styles.sub}>{subText}</p>
+          <div className={styles.row}>
+            <span className={styles.price}>฿{Number(price).toLocaleString()}</span>
             {status === 'available' ? (
-              <a
-                href={`https://line.me/R/ti/p/~YOUR_LINE_ID?text=สนใจสั่งซื้อสินค้า:%20${encodeURIComponent(displayName)}`}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.buyBtn}
+              <button 
+                className={styles.chatBtn} 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  window.open(`https://line.me/R/ti/p/~YOUR_LINE_ID?text=สนใจสั่งซื้อสินค้า:%20${encodeURIComponent(displayName)}`, '_blank')
+                }}
               >
-                <ShoppingBag size={12} /> ซื้อชิ้นนี้
-              </a>
+                Chat
+              </button>
             ) : (
-              <button className={styles.disabledBuyBtn} disabled>
+              <button className={`${styles.chatBtn} ${styles.chatBtnOff}`} disabled onClick={(e) => e.stopPropagation()}>
                 {STATUS_LABEL[status]}
               </button>
             )}
@@ -211,50 +148,34 @@ export default function ProductCard({ product }) {
                     )}
                   </>
                 ) : (
-                  <div className={styles.noImage}>ไม่มีรูปภาพ</div>
+                  <div className={styles.noImage}>
+                    <i className="ti ti-shirt" style={{ fontSize: '48px', color: 'var(--muted)' }} />
+                  </div>
                 )}
               </div>
 
               {/* Details & Specs Section */}
               <div className={styles.modalInfo}>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-                  <span className={`${styles.badge} ${badgeClass}`} style={{ position: 'static' }}>
-                    {badgeLabel}
-                  </span>
-                  <span className={styles.categoryTag}>
-                    ระดับสภาพ {score}%
-                  </span>
-                </div>
-                
-                <h2 className={styles.modalTitle}>{displayName}</h2>
-                
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginBottom: '24px' }}>
-                  <span className={styles.modalPrice}>฿{Number(price).toLocaleString()}</span>
-                  {originalPrice && (
-                    <span style={{ fontSize: '0.9rem', textDecoration: 'line-through', color: 'var(--muted)' }}>
-                      ฿{originalPrice.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-                
-                <div className={styles.modalDescWrap}>
-                  <h4>รายละเอียดสินค้า:</h4>
-                  <p className={styles.modalDesc}>{description || 'ไม่มีรายละเอียดเพิ่มเติมสำหรับสินค้านี้'}</p>
-                </div>
+                <div>
+                  <h2 className={styles.modalTitle}>{displayName}</h2>
+                  <div className={styles.modalPrice}>฿{Number(price).toLocaleString()}</div>
+                  
+                  <div className={styles.modalDescWrap}>
+                    <h4>รายละเอียดสินค้า:</h4>
+                    <p className={styles.modalDesc}>{description || 'ไม่มีรายละเอียดเพิ่มเติมสำหรับสินค้านี้'}</p>
+                  </div>
 
-                <div className={styles.specsWrap}>
-                  <h4>ข้อมูลการตรวจสอบสภาพ:</h4>
-                  <ul className={styles.specsList}>
-                    {specsList.map((spec, index) => (
-                      <li key={index}>
-                        <CheckSquare size={12} style={{ color: 'var(--primary)', marginRight: '8px', flexShrink: 0 }} />
-                        <span>{spec}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className={styles.specsWrap}>
+                    <h4>ข้อมูลการตรวจสอบสภาพ:</h4>
+                    <ul className={styles.specsList}>
+                      <li>สภาพสินค้าโดยรวม: <strong>{score}%</strong></li>
+                      <li>สถานะสินค้า: <strong>{TH_STATUS_LABEL[status]}</strong></li>
+                      <li>หมวดหมู่สินค้า: <strong>{category === 'clothing' ? 'เสื้อผ้า' : category === 'footwear' ? 'รองเท้า' : category === 'electronics' ? 'อิเล็กทรอนิกส์' : category === 'accessories' ? 'เครื่องประดับ' : category || 'สินค้า'}</strong></li>
+                    </ul>
+                  </div>
                 </div>
                 
-                <div className={styles.modalActions}>
+                <div>
                   {status === 'available' ? (
                     <a
                       href={`https://line.me/R/ti/p/~YOUR_LINE_ID?text=สนใจสั่งซื้อสินค้า:%20${encodeURIComponent(displayName)}`}
@@ -262,7 +183,7 @@ export default function ProductCard({ product }) {
                       rel="noreferrer"
                       className={styles.modalBuyBtn}
                     >
-                      แชทสั่งซื้อสินค้าชิ้นนี้ (สิทธิ์ตามคิวแชท)
+                      แชทสั่งซื้อสินค้าชิ้นนี้
                     </a>
                   ) : (
                     <button className={styles.modalSoldBtn} disabled>

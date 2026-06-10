@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPSZZ — Premium Second-Hand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0D0D0D;--red:#D0021B;--blue:#1246B5;
+  --muted:#8A8A86;--border:#E5E5E3;--bg:#fff;--surface:#F7F7F5;
+}
+@media(prefers-color-scheme:dark){
+  :root{--ink:#F0F0EE;--muted:#888884;--border:#2A2A28;--bg:#111110;--surface:#1A1A18;}
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:0 2rem}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(8px);border-bottom:0.5px solid var(--border)}
+@media(prefers-color-scheme:dark){nav{background:rgba(17,17,16,0.96)}}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:20px 2rem;max-width:1100px;margin:0 auto}
+.logo{font-size:15px;font-weight:500;letter-spacing:-0.3px;color:var(--ink);text-decoration:none}
+.logo-dot{color:var(--red)}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--ink)}
+.nav-cta{color:var(--ink)!important;font-weight:500;border-bottom:1px solid var(--ink)}
+.hero{padding:80px 0 72px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.hero-kicker{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.hero-h{font-size:44px;font-weight:300;line-height:1.05;letter-spacing:-1.5px;margin-bottom:20px}
+.hero-h em{font-style:italic;color:var(--muted)}
+.hero-h strong{font-weight:500}
+.hero-p{font-size:14px;color:var(--muted);line-height:1.8;max-width:300px;font-weight:300;margin-bottom:32px}
+.hero-acts{display:flex;gap:16px;align-items:center}
+.btn-primary{font-size:12px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;background:var(--ink);color:var(--bg);border:none;padding:10px 22px;cursor:pointer;transition:opacity .15s}
+.btn-primary:hover{opacity:.75}
+.btn-text{font-size:12px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .15s}
+.btn-text:hover{color:var(--ink)}
+.hero-r{aspect-ratio:3/4;background:var(--surface);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;max-height:400px}
+.hero-r-bg{position:absolute;font-size:120px;font-weight:500;color:var(--border);letter-spacing:-6px;user-select:none;pointer-events:none}
+.hero-r-inner{display:flex;flex-direction:column;align-items:center;gap:10px;z-index:2}
+.hero-r-inner i{font-size:32px;color:var(--muted)}
+.hero-r-inner span{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.new-pill{position:absolute;top:16px;left:16px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;background:var(--red);color:#fff;padding:4px 10px}
+.products-section{padding:56px 0}
+.sec-hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px}
+.sec-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.sec-count{font-size:11px;color:var(--muted)}
+.filters{display:flex;gap:6px;margin-bottom:28px;flex-wrap:wrap}
+.f-btn{font-size:11px;letter-spacing:.5px;text-transform:uppercase;padding:5px 12px;border:0.5px solid var(--border);background:none;color:var(--muted);cursor:pointer;transition:all .15s}
+.f-btn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.f-btn:hover:not(.on){border-color:var(--muted);color:var(--ink)}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:0.5px solid var(--border)}
+.pc{background:var(--bg);cursor:pointer;transition:background .1s}
+.pc:hover{background:var(--surface)}
+.pc.gone{display:none}
+.pc-img{aspect-ratio:1/1;background:var(--surface);display:flex;align-items:center;justify-content:center;position:relative}
+.pc-img i{font-size:28px;color:var(--muted)}
+.sbadge{position:absolute;top:0;left:0;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:4px 8px}
+.b-av{background:var(--blue);color:#fff}
+.b-re{background:#B87D00;color:#fff}
+.b-so{background:var(--muted);color:var(--bg)}
+.pc-info{padding:12px}
+.pc-name{font-size:13px;font-weight:500;margin-bottom:2px}
+.pc-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
+.pc-row{display:flex;align-items:center;justify-content:space-between}
+.pc-price{font-size:13px;font-weight:500}
+.pc-chat{font-size:10px;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border:0.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer;transition:all .15s}
+.pc-chat:hover{background:var(--ink);color:var(--bg)}
+.pc-chat.off{border-color:var(--border);color:var(--muted);cursor:default}
+.pc-chat.off:hover{background:none;color:var(--muted)}
+.brand-block{padding:72px 0;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;border-top:0.5px solid var(--border)}
+.overline{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:24px}
+.brand-h{font-size:38px;font-weight:300;letter-spacing:-1.5px;line-height:1.1}
+.brand-h span{color:var(--red)}
+.trait{display:flex;gap:20px;padding:18px 0;border-bottom:0.5px solid var(--border)}
+.trait:last-child{border:none;padding-bottom:0}
+.trait-n{font-size:10px;color:var(--muted);min-width:18px;padding-top:1px}
+.trait-t{font-size:13px;color:var(--muted);line-height:1.7;font-weight:300}
+.trait-t strong{color:var(--ink);font-weight:500}
+.track-block{display:grid;grid-template-columns:1fr 1fr;border-top:0.5px solid var(--border)}
+.track-l{padding:56px 40px 56px 0}
+.track-h{font-size:36px;font-weight:300;letter-spacing:-1.5px;line-height:1.1;margin-bottom:16px}
+.track-h strong{font-weight:500}
+.track-p{font-size:13px;color:var(--muted);line-height:1.8;font-weight:300;margin-bottom:24px}
+.tfield{display:flex;border:0.5px solid var(--border)}
+.tfield:focus-within{border-color:var(--muted)}
+.tfield input{flex:1;padding:10px 14px;font-size:13px;border:none;outline:none;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif}
+.tfield input::placeholder{color:var(--muted)}
+.tfield button{background:var(--ink);color:var(--bg);border:none;padding:10px 18px;font-size:11px;font-weight:500;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.tfield button:hover{opacity:.75}
+.tmsg{font-size:11px;color:var(--muted);margin-top:10px;min-height:16px}
+.track-r{padding:56px 0 56px 40px;border-left:0.5px solid var(--border)}
+.step{display:flex;gap:14px;padding:14px 0;border-bottom:0.5px solid var(--border)}
+.step:last-child{border:none;padding-bottom:0}
+.sdot{width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px}
+.sdot.done{background:var(--blue);color:#fff}
+.sdot.now{background:var(--red);color:#fff}
+.sdot.wait{border:0.5px solid var(--border);color:var(--muted)}
+.sname{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.ssub{font-size:11px;color:var(--muted)}
+.cta-row{padding:48px 0;display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--border)}
+.cta-h{font-size:26px;font-weight:300;letter-spacing:-1px;line-height:1.2}
+.cta-h strong{font-weight:500}
+.cta-btns{display:flex;gap:8px}
+.cta-b1{font-size:12px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;background:var(--ink);color:var(--bg);border:none;padding:10px 20px;cursor:pointer;transition:opacity .15s}
+.cta-b1:hover{opacity:.75}
+.cta-b2{font-size:12px;font-weight:400;letter-spacing:.5px;text-transform:uppercase;background:none;color:var(--ink);border:0.5px solid var(--border);padding:10px 20px;cursor:pointer;transition:border-color .15s}
+.cta-b2:hover{border-color:var(--muted)}
+footer{border-top:0.5px solid var(--border)}
+.footer-inner{padding:24px 2rem;max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.f-logo{font-size:14px;font-weight:500}
+.f-copy{font-size:11px;color:var(--muted)}
+.f-nav{display:flex;gap:20px}
+.f-nav a{font-size:11px;color:var(--muted);text-decoration:none;transition:color .15s}
+.f-nav a:hover{color:var(--ink)}
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr;padding:48px 0 40px}
+  .hero-r{max-height:260px;aspect-ratio:unset;height:260px}
+  .hero-r-bg{font-size:72px}
+  .hero-h{font-size:34px}
+  .pgrid{grid-template-columns:repeat(2,1fr)}
+  .brand-block{grid-template-columns:1fr;gap:40px;padding:48px 0}
+  .track-block{grid-template-columns:1fr}
+  .track-l{padding:48px 0 32px}
+  .track-r{padding:32px 0 48px;border-left:none;border-top:0.5px solid var(--border)}
+  .cta-row{flex-direction:column;align-items:flex-start;gap:24px}
+  .footer-inner{flex-direction:column;gap:16px;text-align:center}
+  .f-nav{flex-wrap:wrap;justify-content:center}
+  .nav-links a:not(.nav-cta){display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="#">rpszz<span class="logo-dot">.</span></a>
+    <div class="nav-links">
+      <a href="#products">collections</a>
+      <a href="#brand">about</a>
+      <a href="#track">track order</a>
+      <a href="#cta" class="nav-cta">chat to buy</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div>
+      <p class="hero-kicker">Premium second-hand</p>
+      <h1 class="hero-h"><strong>Curated</strong><br><em>for those</em><br><strong>who know.</strong></h1>
+      <p class="hero-p">เสื้อผ้า รองเท้า accessories วินเทจ คัดสรรโดย Rapeepong ของแท้ทุกชิ้น สต็อก real-time</p>
+      <div class="hero-acts">
+        <button class="btn-primary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Browse</button>
+        <a class="btn-text" href="#track">Track order <i class="ti ti-arrow-right" aria-hidden="true"></i></a>
+      </div>
+    </div>
+    <div class="hero-r">
+      <span class="hero-r-bg">RPSZZ</span>
+      <span class="new-pill">New drop</span>
+      <div class="hero-r-inner">
+        <i class="ti ti-shirt" aria-hidden="true"></i>
+        <span>hero image</span>
+      </div>
+    </div>
+  </section>
+
+  <div style="height:0.5px;background:var(--border)"></div>
+
+  <section class="products-section" id="products">
+    <div class="sec-hd">
+      <span class="sec-label">Latest stock</span>
+      <span class="sec-count" id="cnt">6 items</span>
+    </div>
+    <div class="filters">
+      <button class="f-btn on" onclick="fil(this,'all')">All</button>
+      <button class="f-btn" onclick="fil(this,'av')">Available</button>
+      <button class="f-btn" onclick="fil(this,'re')">Reserved</button>
+      <button class="f-btn" onclick="fil(this,'so')">Sold</button>
+    </div>
+    <div class="pgrid" id="g">
+      <div class="pc" data-s="av">
+        <div class="pc-img"><i class="ti ti-shirt" aria-hidden="true"></i><span class="sbadge b-av">Available</span></div>
+        <div class="pc-info"><p class="pc-name">Vintage Denim Jacket</p><p class="pc-sub">M · Levi's · 90s</p><div class="pc-row"><span class="pc-price">฿1,800</span><button class="pc-chat">Chat</button></div></div>
+      </div>
+      <div class="pc" data-s="re">
+        <div class="pc-img"><i class="ti ti-shoe" aria-hidden="true"></i><span class="sbadge b-re">Reserved</span></div>
+        <div class="pc-info"><p class="pc-name">Nike Air Max 97</p><p class="pc-sub">42 · Triple Black</p><div class="pc-row"><span class="pc-price">฿4,500</span><button class="pc-chat off">Reserved</button></div></div>
+      </div>
+      <div class="pc" data-s="av">
+        <div class="pc-img"><i class="ti ti-shirt" aria-hidden="true"></i><span class="sbadge b-av">Available</span></div>
+        <div class="pc-info"><p class="pc-name">Carhartt WIP Hoodie</p><p class="pc-sub">L · Navy Wash</p><div class="pc-row"><span class="pc-price">฿2,200</span><button class="pc-chat">Chat</button></div></div>
+      </div>
+      <div class="pc" data-s="so">
+        <div class="pc-img"><i class="ti ti-backpack" aria-hidden="true"></i><span class="sbadge b-so">Sold</span></div>
+        <div class="pc-info"><p class="pc-name">Eastpak Backpack</p><p class="pc-sub">One size · Black</p><div class="pc-row"><span class="pc-price">฿1,200</span><button class="pc-chat off">Sold</button></div></div>
+      </div>
+      <div class="pc" data-s="av">
+        <div class="pc-img"><i class="ti ti-hat" aria-hidden="true"></i><span class="sbadge b-av">Available</span></div>
+        <div class="pc-info"><p class="pc-name">Cap Collection</p><p class="pc-sub">Various · Deadstock</p><div class="pc-row"><span class="pc-price">฿650</span><button class="pc-chat">Chat</button></div></div>
+      </div>
+      <div class="pc" data-s="av">
+        <div class="pc-img"><i class="ti ti-shirt" aria-hidden="true"></i><span class="sbadge b-av">Available</span></div>
+        <div class="pc-info"><p class="pc-name">Ralph Lauren Shirt</p><p class="pc-sub">S · Vintage Stripe</p><div class="pc-row"><span class="pc-price">฿890</span><button class="pc-chat">Chat</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="brand-block" id="brand">
+    <div>
+      <p class="overline">About</p>
+      <h2 class="brand-h">Sleek.<br>Bold.<br><span>Authentic.</span></h2>
+    </div>
+    <div>
+      <div class="trait"><span class="trait-n">01</span><p class="trait-t"><strong>ของแท้ 100%</strong> — ตรวจสอบก่อนลง stock ทุกชิ้น</p></div>
+      <div class="trait"><span class="trait-n">02</span><p class="trait-t"><strong>Real-time stock</strong> — Available, Reserved, Sold อัปเดตทันที</p></div>
+      <div class="trait"><span class="trait-n">03</span><p class="trait-t"><strong>Direct purchase</strong> — ซื้อตรงผ่านแชท ไม่มีตัวแทน</p></div>
+      <div class="trait"><span class="trait-n">04</span><p class="trait-t"><strong>Order tracking</strong> — ติดตามสถานะ 24 ชม. ด้วยเบอร์โทร</p></div>
+    </div>
+  </section>
+
+  <div class="track-block" id="track">
+    <div class="track-l">
+      <p class="overline">Order tracking</p>
+      <h2 class="track-h"><strong>Track</strong><br>your order.</h2>
+      <p class="track-p">ใส่เบอร์โทรศัพท์ที่ใช้สั่งซื้อเพื่อดูสถานะการจัดส่ง</p>
+      <div class="tfield">
+        <input id="ph" type="tel" placeholder="เบอร์โทรศัพท์">
+        <button onclick="doTrack()">ค้นหา</button>
+      </div>
+      <p class="tmsg" id="tm"></p>
+    </div>
+    <div class="track-r">
+      <div class="step"><div class="sdot done"><i class="ti ti-check" aria-hidden="true"></i></div><div><p class="sname">Confirmed</p><p class="ssub">ยืนยัน order แล้ว</p></div></div>
+      <div class="step"><div class="sdot done"><i class="ti ti-check" aria-hidden="true"></i></div><div><p class="sname">Packaging</p><p class="ssub">กำลังแพ็คสินค้า</p></div></div>
+      <div class="step"><div class="sdot now"><i class="ti ti-truck" aria-hidden="true"></i></div><div><p class="sname">In Transit</p><p class="ssub">อยู่ระหว่างจัดส่ง</p></div></div>
+      <div class="step"><div class="sdot wait"><i class="ti ti-home" aria-hidden="true"></i></div><div><p class="sname">Delivered</p><p class="ssub">รอรับสินค้า</p></div></div>
+    </div>
+  </div>
+
+  <div class="cta-row" id="cta">
+    <h3 class="cta-h"><strong>Chat</strong> to buy.<br>Easy &amp; fast.</h3>
+    <div class="cta-btns">
+      <button class="cta-b1">LINE</button>
+      <button class="cta-b2">Instagram</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="f-logo">rpszz<span style="color:var(--red)">.</span></span>
+    <span class="f-copy">© 2026 Premium Second-Hand by Rapeepong</span>
+    <nav class="f-nav" aria-label="footer">
+      <a href="#products">collections</a>
+      <a href="#brand">about</a>
+      <a href="#track">track order</a>
+      <a href="#cta">contact</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+function fil(btn,type){
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  let n=0;
+  document.querySelectorAll('.pc').forEach(c=>{
+    const show=type==='all'||c.dataset.s===type;
+    c.classList.toggle('gone',!show);
+    if(show)n++;
+  });
+  document.getElementById('cnt').textContent=n+' item'+(n!==1?'s':'');
+}
+function doTrack(){
+  const v=document.getElementById('ph').value.trim();
+  const m=document.getElementById('tm');
+  if(!v){m.textContent='กรุณาใส่เบอร์โทรศัพท์ก่อน';return}
+  m.textContent='กำลังค้นหา...';
+  setTimeout(()=>{m.textContent='ไม่พบ order สำหรับ '+v+' — กรุณาติดต่อ LINE'},900);
+}
+document.getElementById('ph').addEventListener('keydown',e=>{if(e.key==='Enter')doTrack()});
+</script>
+</body>
+</html>

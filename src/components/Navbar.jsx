@@ -6,22 +6,46 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
 
+  const handleNavClick = (anchorId) => {
+    setOpen(false)
+    if (pathname === '/') {
+      const el = document.getElementById(anchorId)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }
+
   return (
     <nav className={styles.nav}>
       <div className={styles.inner}>
-        <Link to="/" className={styles.logo} style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <img src="/logo.png" alt="RPSZZ Logo" className={styles.logoImg} />
-          <span className={styles.logoText}>
-            <span className={styles.logoR}>R</span>PSZZ
-          </span>
+        <Link to="/" className={styles.logo}>
+          rpszz<span className={styles.logoDot}>.</span>
         </Link>
 
         <div className={`${styles.links} ${open ? styles.open : ''}`}>
-          <Link to="/" className={pathname === '/' ? styles.active : ''} onClick={() => setOpen(false)}>
-            สินค้า
-          </Link>
-          <Link to="/track" className={pathname === '/track' ? styles.active : ''} onClick={() => setOpen(false)}>
-            เช็คสถานะ
+          {pathname === '/' ? (
+            <a href="#products" className={styles.link} onClick={() => handleNavClick('products')}>
+              collections
+            </a>
+          ) : (
+            <Link to="/" className={styles.link} onClick={() => setOpen(false)}>
+              collections
+            </Link>
+          )}
+
+          {pathname === '/' ? (
+            <a href="#brand" className={styles.link} onClick={() => handleNavClick('brand')}>
+              about
+            </a>
+          ) : (
+            <Link to="/" className={styles.link} onClick={() => setOpen(false)}>
+              about
+            </Link>
+          )}
+
+          <Link to="/track" className={`${styles.link} ${pathname === '/track' ? styles.active : ''}`} onClick={() => setOpen(false)}>
+            track order
           </Link>
 
           <a
@@ -31,7 +55,7 @@ export default function Navbar() {
             className={styles.ctaLink}
             onClick={() => setOpen(false)}
           >
-            สั่งซื้อ / แชท
+            chat to buy
           </a>
         </div>
 

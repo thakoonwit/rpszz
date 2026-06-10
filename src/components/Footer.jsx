@@ -1,80 +1,66 @@
 import React from 'react'
-import { MessageSquare, Instagram, Facebook } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
 
 export default function Footer() {
   const currentYear = new Date().getFullYear()
+  const { pathname } = useLocation()
+
+  const handleNavClick = (anchorId) => {
+    if (pathname === '/') {
+      const el = document.getElementById(anchorId)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }
 
   return (
-    <footer style={{ 
-      borderTop: '1px solid var(--border)', 
-      padding: 'var(--space-xl) 0', 
-      backgroundColor: 'var(--surface)',
-      marginTop: 'var(--space-3xl)' 
-    }}>
-      <div className="container" style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        gap: 'var(--space-md)',
-        textAlign: 'center'
+    <footer style={{ borderTop: '0.5px solid var(--border)', background: 'var(--bg)' }}>
+      <div style={{
+        padding: '24px 2rem',
+        maxWidth: '1100px',
+        margin: '0 auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-          <img src="/logo.png" alt="Rpszz Logo" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-0.04em', margin: 0 }}>
-            <span style={{ color: 'var(--accent)' }}>R</span>PSZZ
-          </h3>
-        </div>
-        
-        <p style={{ fontSize: '0.9rem', maxWidth: '500px', margin: '0 auto', color: 'var(--muted)', fontFamily: 'var(--font-sans)', lineHeight: '1.6' }}>
-          สินค้ามือสองคัดสรรพิเศษโดย Rapeepong สั่งซื้อผ่านช่องทางแชทเท่านั้นเพื่อให้คุณได้รับบริการที่รวดเร็วและตรวจสอบสต็อกได้แม่นยำ
-        </p>
-        
-        <div style={{ display: 'flex', gap: 'var(--space-md)', marginTop: 'var(--space-xs)' }}>
-          <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MessageSquare size={16} /> แชทผ่าน Line
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Instagram size={16} /> อินสตาแกรม
-          </a>
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem 1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Facebook size={16} /> เฟซบุ๊ก
-          </a>
-        </div>
-        
-        <div style={{ 
-          fontSize: '0.85rem', 
-          color: 'var(--muted)', 
-          marginTop: 'var(--space-lg)',
-          borderTop: '1px solid var(--border)',
-          width: '100%',
-          paddingTop: 'var(--space-md)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '6px',
-          flexWrap: 'wrap'
-        }}>
-          <span>&copy; {currentYear} Rpszz. สงวนลิขสิทธิ์</span>
-          <span style={{ color: 'var(--border)' }}>|</span>
-          <span>
-            RpszzShop Powered By{' '}
-            <a 
-              href="https://uwaver.site" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              style={{ 
-                color: 'var(--primary)', 
-                fontWeight: '600',
-                borderBottom: '1px solid transparent',
-                transition: 'all var(--transition-fast)'
-              }}
-              onMouseEnter={(e) => e.target.style.borderBottom = '1px solid var(--primary)'}
-              onMouseLeave={(e) => e.target.style.borderBottom = '1px solid transparent'}
-            >
-              Uwaver
+        <span style={{ fontSize: '14px', fontWeight: 500, fontFamily: 'var(--font-display)', color: 'var(--ink)' }}>
+          rpszz<span style={{ color: 'var(--red)' }}>.</span>
+        </span>
+        <span style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: 'var(--font-sans)' }}>
+          © {currentYear} Premium Second-Hand by Rapeepong
+        </span>
+        <nav style={{ display: 'flex', gap: '20px' }} aria-label="footer">
+          {pathname === '/' ? (
+            <a href="#products" style={{ fontSize: '11px', color: 'var(--muted)' }} onClick={() => handleNavClick('products')}>
+              collections
             </a>
-          </span>
-        </div>
+          ) : (
+            <Link to="/" style={{ fontSize: '11px', color: 'var(--muted)' }}>
+              collections
+            </Link>
+          )}
+
+          {pathname === '/' ? (
+            <a href="#brand" style={{ fontSize: '11px', color: 'var(--muted)' }} onClick={() => handleNavClick('brand')}>
+              about
+            </a>
+          ) : (
+            <Link to="/" style={{ fontSize: '11px', color: 'var(--muted)' }}>
+              about
+            </Link>
+          )}
+
+          <Link to="/track" style={{ fontSize: '11px', color: 'var(--muted)' }}>
+            track order
+          </Link>
+          
+          <a href="#cta" style={{ fontSize: '11px', color: 'var(--muted)' }} onClick={() => handleNavClick('cta')}>
+            contact
+          </a>
+        </nav>
       </div>
     </footer>
   )

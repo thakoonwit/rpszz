@@ -1,20 +1,11 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import ProductCard from '../components/ProductCard.jsx'
 import styles from './HomePage.module.css'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
-import { Store, Info, Star, Facebook, Eye, ArrowRight, ShieldCheck, ThumbsUp } from 'lucide-react'
 import toast, { Toaster } from 'react-hot-toast'
-
-const CATEGORY_TABS = [
-  { id: 'all', label: 'ทั้งหมด' },
-  { id: 'clothing', label: 'เสื้อผ้า' },
-  { id: 'footwear', label: 'รองเท้า' },
-  { id: 'electronics', label: 'อิเล็กทรอนิกส์' },
-  { id: 'accessories', label: 'เครื่องประดับ' },
-  { id: 'other', label: 'อื่นๆ' }
-]
 
 const FALLBACK_PRODUCTS = [
   {
@@ -49,46 +40,23 @@ const FALLBACK_PRODUCTS = [
   }
 ]
 
-const FALLBACK_REVIEWS = [
-  {
-    id: 'r1',
-    customer_name: 'คุณอมรเทพ ส.',
-    rating: 5,
-    comment: 'สภาพกล้องสวยถูกใจตามในรูปเป๊ะครับ ทางร้านถ่ายภาพมุมซูมรายละเอียดจุดรอยขนแมวมาแบบชัดเจน ซื่อสัตย์มาก ไม่ปกปิดตำหนิเลย มั่นใจร้านนี้ครับ',
-    facebook_url: 'https://facebook.com',
-    avatar_url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=anan'
-  },
-  {
-    id: 'r2',
-    customer_name: 'คุณภัทราภรณ์ ว.',
-    rating: 5,
-    comment: 'แจ็คเก็ตสะอาดมาก ไม่มีกลิ่นอับชื้นเหมือนเสื้อผ้ามือสองทั่วไป ส่งซักแห้งฆ่าเชื้อมาให้เรียบร้อย สภาพดีงามขนฟูสวยตามที่ลงรายละเอียดไว้เลยค่ะ',
-    facebook_url: 'https://facebook.com',
-    avatar_url: 'https://api.dicebear.com/7.x/adventurer/svg?seed=sompong'
-  }
-]
-
 export default function Home() {
   const [products, setProducts] = useState([])
-  const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all') // 'all', 'available', 'reserved', 'sold'
   const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState('default')
-  const [newsletterEmail, setNewsletterEmail] = useState('')
 
   const hasConvex = !!import.meta.env.VITE_CONVEX_URL
 
   const convexProducts = useQuery(hasConvex ? api.products.list : api.products.list)
-  const convexReviews = useQuery(hasConvex ? api.reviews.list : api.reviews.list)
 
   const fetchData = async (showLoading = true) => {
     if (showLoading) setLoading(true)
     try {
-      const [{ data: dbProducts, error: prodError }, { data: dbReviews, error: revError }] = await Promise.all([
-        supabase.from('products').select('*').order('created_at', { ascending: false }),
-        supabase.from('reviews').select('*').order('created_at', { ascending: false })
-      ])
+      const { data: dbProducts, error: prodError } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false })
 
       if (prodError || !dbProducts || dbProducts.length === 0) {
         const localProds = localStorage.getItem('rpszz_local_products')
@@ -100,35 +68,21 @@ export default function Home() {
       } else {
         setProducts(dbProducts)
       }
-
-      if (revError || !dbReviews || dbReviews.length === 0) {
-        const localRevs = localStorage.getItem('rpszz_local_reviews')
-        if (localRevs) {
-          setReviews(JSON.parse(localRevs))
-        } else {
-          setReviews(FALLBACK_REVIEWS)
-        }
-      } else {
-        setReviews(dbReviews)
-      }
     } catch (err) {
       console.error('Error fetching data:', err)
       const localProds = localStorage.getItem('rpszz_local_products')
       setProducts(localProds ? JSON.parse(localProds) : FALLBACK_PRODUCTS)
-      const localRevs = localStorage.getItem('rpszz_local_reviews')
-      setReviews(localRevs ? JSON.parse(localRevs) : FALLBACK_REVIEWS)
     } finally {
       if (showLoading) setLoading(false)
     }
   }
 
   useEffect(() => {
-    if (hasConvex && convexProducts && convexReviews) {
+    if (hasConvex && convexProducts) {
       setProducts(convexProducts.map(p => ({ ...p, id: p._id })))
-      setReviews(convexReviews.map(r => ({ ...r, id: r._id })))
       setLoading(false)
     }
-  }, [convexProducts, convexReviews, hasConvex])
+  }, [convexProducts, hasConvex])
 
   useEffect(() => {
     if (!hasConvex) {
@@ -146,356 +100,168 @@ export default function Home() {
     }
   }, [hasConvex])
 
-  // Get condition percentage helper
-  const getConditionScore = (p) => {
-    const desc = p.description || ''
-    const match = desc.match(/(\d+)%/)
-    if (match) return parseInt(match[1])
-    const numId = p.id ? p.id.toString().charCodeAt(0) : 95
-    return 85 + (numId % 14)
-  }
-
-  // Filter & Sort logic
-  const filteredAndSortedProducts = products
-    .filter(p => {
-      const matchCategory = activeCategory === 'all' || p.category === activeCategory
-      const displayName = p.name || p.title || ''
-      const matchSearch = !search || displayName.toLowerCase().includes(search.toLowerCase()) || (p.description && p.description.toLowerCase().includes(search.toLowerCase()))
-      return matchCategory && matchSearch
-    })
-    .sort((a, b) => {
-      if (sortBy === 'low-high') {
-        return a.price - b.price
-      }
-      if (sortBy === 'high-low') {
-        return b.price - a.price
-      }
-      if (sortBy === 'condition-rank') {
-        return getConditionScore(b) - getConditionScore(a)
-      }
-      return 0
-    })
-
-  // Find spotlight product
-  const spotlightProduct = products.find(p => p.status === 'available' && p.image_url) || products[0] || FALLBACK_PRODUCTS[0]
-  const spotlightImage = spotlightProduct?.image_url ? spotlightProduct.image_url.split(',')[0].trim() : ''
-
-  const handleNewsletterSubmit = (e) => {
-    e.preventDefault()
-    if (!newsletterEmail || !newsletterEmail.includes('@')) {
-      toast.error('กรุณากรอกอีเมลของคุณให้ถูกต้อง เพื่อรับสิทธิ์จองสินค้าด่วน')
-      return
-    }
-    toast.success('สมัครเข้าร่วมรายชื่อจองคิวรับข่าวสารสำเร็จ!')
-    setNewsletterEmail('')
-  }
+  // Filter logic
+  const filteredProducts = products.filter(p => {
+    const matchStatus = statusFilter === 'all' || p.status === statusFilter
+    const displayName = p.name || p.title || ''
+    const matchSearch = !search || displayName.toLowerCase().includes(search.toLowerCase()) || 
+      (p.description && p.description.toLowerCase().includes(search.toLowerCase())) ||
+      (p.category && p.category.toLowerCase().includes(search.toLowerCase()))
+    return matchStatus && matchSearch
+  })
 
   return (
     <div className={styles.page}>
       <Toaster />
-      <div className={styles.heroAccentLine} />
 
-      {/* Hero: Boutique Editorial Grid */}
-      <section className={styles.hero}>
-        <div className="container">
-          <div className={styles.heroGrid}>
-            
-            {/* Left Column: Bold Asymmetric Typography */}
-            <div className={styles.heroContent}>
-              <div className={styles.tagline}>
-                <span className={`${styles.pingDot} animate-pulse`} />
-                RPSZZ / ARCHIVE COLLECTIBLES
-              </div>
-              
-              <h1 className={styles.heroTitle}>
-                THE EDITORIAL <br />
-                <span className={styles.heroTitleHighlight}>ARCHIVE</span> OF VINTAGE
-              </h1>
-              
-              <p className={styles.heroSub}>
-                คอลเลกชันเสื้อผ้า ของใช้สะสม และแกดเจ็ตวินเทจคัดเกรดพิเศษโดย Rapeepong ทุกชิ้นผ่านการตรวจสอบคุณภาพ บันทึกตำหนิและประเมินเปอร์เซ็นต์ความสมบูรณ์แบบตรงไปตรงมา สั่งซื้อจองสินค้าผ่านทางแชทเท่านั้น
-              </p>
-
-              <div className={styles.heroActions}>
-                <a href="#shop-section" className={styles.primaryBtn}>
-                  <Store size={14} style={{ marginRight: '8px' }} /> เลือกชมสินค้าทั้งหมด
-                </a>
-                <a href="#conditions-section" className={styles.secondaryBtn}>
-                  <Info size={14} style={{ marginRight: '8px' }} /> มาตรฐานสภาพสินค้า
-                </a>
-              </div>
-
-              {/* Trust badges */}
-              <div className={styles.quickStats}>
-                <div>
-                  <div className={styles.statNum}>100%</div>
-                  <div className={styles.statLabel}>REAL CAPTURES</div>
-                </div>
-                <div>
-                  <div className={`${styles.statNum} ${styles.statNumAccent}`}>LIMITED</div>
-                  <div className={styles.statLabel}>1-OF-1 SELECTIONS</div>
-                </div>
-                <div>
-                  <div className={`${styles.statNum} ${styles.statNumPrimary}`}>VERIFIED</div>
-                  <div className={styles.statLabel}>AUTHENTIC PIECES</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column: Floating Curated Showcase */}
-            {spotlightProduct && (
-              <div className={styles.spotlightCard}>
-                <div className={styles.spotlightHeader}>
-                  <span className={styles.spotlightBadge}>WEEKLY SPOTLIGHT</span>
-                  <div className={styles.spotlightDots}>
-                    <span className={styles.spotlightDot} style={{ backgroundColor: 'var(--accent)' }} />
-                    <span className={styles.spotlightDot} style={{ backgroundColor: 'var(--ink)' }} />
-                  </div>
-                </div>
-                
-                <div className={styles.spotlightImageWrap}>
-                  {spotlightImage ? (
-                    <img src={spotlightImage} alt={spotlightProduct.title || spotlightProduct.name} className={styles.spotlightImage} />
-                  ) : (
-                    <div className="flex-center" style={{ height: '100%', backgroundColor: 'var(--bg)', color: 'var(--muted)' }}>ไม่มีรูปภาพ</div>
-                  )}
-                </div>
-
-                <div className={styles.spotlightInfo}>
-                  <div>
-                    <span className={styles.spotlightCategory}>
-                      {spotlightProduct.category === 'clothing' ? 'เสื้อผ้า' : spotlightProduct.category === 'footwear' ? 'รองเท้า' : spotlightProduct.category === 'electronics' ? 'อิเล็กทรอนิกส์' : spotlightProduct.category === 'accessories' ? 'เครื่องประดับ' : spotlightProduct.category || 'สินค้า'}
-                    </span>
-                    <h3 className={styles.spotlightTitle}>{spotlightProduct.title || spotlightProduct.name}</h3>
-                  </div>
-                  <div className={styles.spotlightPriceWrap}>
-                    <span className={styles.spotlightPrice}>฿{Number(spotlightProduct.price || 0).toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <p className={styles.spotlightDesc}>{spotlightProduct.description || 'ไม่มีรายละเอียดเพิ่มเติมสำหรับสินค้านี้'}</p>
-                
-                <a 
-                  href={`https://line.me/R/ti/p/~YOUR_LINE_ID?text=สนใจสั่งซื้อสินค้า Spotlight:%20${encodeURIComponent(spotlightProduct.title || spotlightProduct.name)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.spotlightBuyBtn}
-                >
-                  <ArrowRight size={14} /> แชทจองชิ้นนี้ทันที
-                </a>
-              </div>
-            )}
-
-          </div>
-        </div>
-      </section>
-
-      {/* Conditions Standards Info Area */}
-      <section className={styles.conditionsSection} id="conditions-section">
-        <div className="container">
-          <h3 className={styles.sectionHeading}>
-            / ประเมินสภาพสินค้าอย่างจริงใจ /
-          </h3>
-          <div className={styles.conditionsGrid}>
-            <div className={styles.conditionBox}>
-              <span className={`${styles.conditionGrade} ${styles.gradeRed}`}>MINT</span>
-              <span className={styles.conditionTitle}>98 - 99% เสมือนมือหนึ่ง</span>
-              <p className={styles.conditionDesc}>สินค้าไร้ริ้วรอย ตำหนิเป็นศูนย์ ครบกล่องสมบูรณ์แบบที่สุด</p>
-            </div>
-            <div className={styles.conditionBox}>
-              <span className={`${styles.conditionGrade} ${styles.gradeBlue}`}>EXCELLENT</span>
-              <span className={styles.conditionTitle}>94 - 97% สภาพดีเยี่ยม</span>
-              <p className={styles.conditionDesc}>มีรอยขนแมวบางๆ สภาพโดยรวมงดงาม ระบบทำงานไร้ที่ติ</p>
-            </div>
-            <div className={styles.conditionBox}>
-              <span className={`${styles.conditionGrade} ${styles.gradeBlack}`}>VERY GOOD</span>
-              <span className={styles.conditionTitle}>90 - 93% สภาพพร้อมใช้</span>
-              <p className={styles.conditionDesc}>รอยจากการใช้งานชัดเจน แต่ใช้งานและสวมใส่ได้ดีเยี่ยม</p>
-            </div>
-            <div className={styles.conditionBox}>
-              <span className={`${styles.conditionGrade} ${styles.gradeMuted}`}>VINTAGE</span>
-              <span className={styles.conditionTitle}>85 - 89% สภาพวินเทจ</span>
-              <p className={styles.conditionDesc}>รอยเฟดหรือรอยซีดตามกาลเวลาที่สร้างเสน่ห์เฉพาะตัว</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Catalog Grid Section */}
-      <section className={styles.catalogSection} id="shop-section">
-        <div className="container">
-          
-          <div className={styles.catalogHeadingArea}>
-            <span className={styles.catalogTagline}>THE COLLECTION</span>
-            <h2 className={styles.catalogTitle}>CURATED PIECES</h2>
-            <div className={styles.catalogTitleDivider} />
-            <p className={styles.catalogSub}>สินค้าส่วนตัวและของแบรนด์เนมวินเทจคัดพิเศษ สต็อกอย่างละ 1 ชิ้น ไม่มีชิ้นที่สองทดแทน</p>
-          </div>
-
-          {/* Catalog Filters Bar */}
-          <div className={styles.toolbar}>
-            <div className={styles.searchWrapper}>
-              <input 
-                type="text" 
-                placeholder="ค้นหาตามชื่อ หรือแบรนด์..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className={styles.toolbarSearch}
-              />
-            </div>
-
-            <div className={styles.tabs}>
-              {CATEGORY_TABS.map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveCategory(tab.id)}
-                  className={`${styles.tabBtn} ${activeCategory === tab.id ? styles.activeTabBtn : ''}`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-
-            <div className={styles.sorterWrapper}>
-              <select 
-                value={sortBy} 
-                onChange={e => setSortBy(e.target.value)}
-                className={styles.sorterSelect}
-              >
-                <option value="default">จัดเรียงสินค้า</option>
-                <option value="low-high">ราคา: ต่ำไปสูง</option>
-                <option value="high-low">ราคา: สูงไปต่ำ</option>
-                <option value="condition-rank">สภาพความสมบูรณ์สูงสุด</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Catalog Product Grid */}
-          {loading ? (
-            <div className={styles.loadingArea}>
-              <div className={styles.loadingSpinner} />
-              <span>กำลังโหลดสินค้าคัดสรร...</span>
-            </div>
-          ) : filteredAndSortedProducts.length === 0 ? (
-            <div className={styles.emptyArea}>
-              <Eye size={36} style={{ color: 'var(--muted)' }} />
-              <div className={styles.emptyTitle}>ไม่พบสินค้าที่ค้นหา</div>
-              <p className={styles.emptySub}>กรุณาลองเปลี่ยนคำค้นหา หรือคัดกรองหมวดหมู่อื่นแทน</p>
-            </div>
-          ) : (
-            <div className={styles.grid}>
-              {filteredAndSortedProducts.map(p => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          )}
-
-        </div>
-      </section>
-
-      {/* Customer Testimonials with Facebook Links */}
-      <section className={styles.testimonialsSection}>
-        <div className="container">
-          
-          <div className={styles.testimonialsHeader}>
-            <div className={styles.testimonialsTitleArea}>
-              <span className={styles.testimonialsTagline}>VERIFIED REVIEWS</span>
-              <h2 className={styles.testimonialsTitle}>รีวิวและเสียงตอบรับจริงจากลูกค้า</h2>
-            </div>
-            
-            <div className={styles.ratingCard}>
-              <div className={styles.ratingStars}>
-                <Star size={12} fill="var(--accent)" stroke="none" />
-                <Star size={12} fill="var(--accent)" stroke="none" />
-                <Star size={12} fill="var(--accent)" stroke="none" />
-                <Star size={12} fill="var(--accent)" stroke="none" />
-                <Star size={12} fill="var(--accent)" stroke="none" />
-              </div>
-              <div>
-                <div className={styles.ratingInfoTitle}>รับประกันความโปร่งใส 100%</div>
-                <div className={styles.ratingInfoSub}>สามารถคลิกตรวจสอบโพสต์รีวิวจาก Facebook จริงได้</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.testimonialsGrid}>
-            {reviews.length === 0 ? (
-              <div className="text-center w-full" style={{ gridColumn: '1 / -1', color: 'var(--muted)', padding: '40px 0' }}>ยังไม่มีข้อเสนอแนะที่ส่งมาขณะนี้</div>
-            ) : (
-              reviews.map(item => (
-                <div key={item.id} className={styles.testimonialCard}>
-                  <div className={styles.testimonialUserArea}>
-                    <img 
-                      src={item.avatar_url || `https://api.dicebear.com/7.x/initials/svg?seed=${item.customer_name}`} 
-                      alt={item.customer_name} 
-                      className={styles.userAvatar} 
-                      style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
-                    />
-                    <div className={styles.userMeta}>
-                      <span className={styles.userName}>{item.customer_name}</span>
-                      
-                      {/* Facebook verified link */}
-                      {item.facebook_url ? (
-                        <a 
-                          href={item.facebook_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="flex items-center" 
-                          style={{ 
-                            fontSize: '11px', 
-                            color: '#1877F2', 
-                            fontWeight: '600', 
-                            display: 'inline-flex',
-                            alignItems: 'center', 
-                            gap: '4px',
-                            marginTop: '2px'
-                          }}
-                        >
-                          <Facebook size={12} fill="#1877F2" stroke="none" /> Verified Profile
-                        </a>
-                      ) : (
-                        <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Verified Buyer</span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* Stars list based on rating */}
-                  <div style={{ display: 'flex', gap: '2px', marginBottom: '8px' }}>
-                    {Array.from({ length: item.rating || 5 }).map((_, idx) => (
-                      <Star key={idx} size={10} fill="var(--accent)" stroke="none" />
-                    ))}
-                  </div>
-
-                  <p className={styles.testimonialText}>"{item.comment}"</p>
-                </div>
-              ))
-            )}
-          </div>
-
-        </div>
-      </section>
-
-      {/* Newsletter Early access email subscription form */}
-      <section className={styles.newsletterSection}>
-        <div className="container">
-          <h3 className={styles.newsletterTitle}>ลงทะเบียนคิว Early Access</h3>
-          <p className={styles.newsletterDesc}>สินค้าทุกชิ้นคัดเกรดมีเพียง 1 ชิ้นเท่านั้น สมัครรับการแจ้งเตือนพัสดุหลุดและสินค้าอัปเดตใหม่ทางอีเมลจองก่อนใคร</p>
-          
-          <form onSubmit={handleNewsletterSubmit} className={styles.newsletterForm}>
-            <input 
-              type="email" 
-              placeholder="กรอกอีเมลของคุณ..." 
-              value={newsletterEmail}
-              onChange={e => setNewsletterEmail(e.target.value)}
-              className={styles.newsletterInput}
-            />
-            <button type="submit" className={styles.newsletterBtn}>
-              สมัครรับสิทธิ์จอง
+      {/* Hero section */}
+      <section className={`${styles.hero} container`}>
+        <div>
+          <p className={styles.heroKicker}>Premium second-hand</p>
+          <h1 className={styles.heroH}>
+            <strong>Curated</strong><br />
+            <em>for those</em><br />
+            <strong>who know.</strong>
+          </h1>
+          <p className={styles.heroP}>
+            เสื้อผ้า รองเท้า accessories วินเทจ คัดสรรโดย Rapeepong ของแท้ทุกชิ้น สต็อก real-time
+          </p>
+          <div className={styles.heroActs}>
+            <button 
+              className="btn btn-primary"
+              onClick={() => document.getElementById('products').scrollIntoView({ behavior: 'smooth' })}
+            >
+              Browse
             </button>
-          </form>
+            <Link to="/track" className="btn-text" style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              Track order <i className="ti ti-arrow-right" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+        <div className={styles.heroR}>
+          <span className={styles.heroRBg}>RPSZZ</span>
+          <span className={styles.newPill}>New drop</span>
+          <div className={styles.heroRInner}>
+            <i className="ti ti-shirt" aria-hidden="true" />
+            <span>hero image</span>
+          </div>
         </div>
       </section>
 
+      <div className="container">
+        <div style={{ height: '0.5px', background: 'var(--border)' }} />
+      </div>
+
+      {/* Products list section */}
+      <section className={`${styles.productsSection} container`} id="products">
+        <div className={styles.secHd}>
+          <span className={styles.secLabel}>Latest stock</span>
+          <span className={styles.secCount}>{filteredProducts.length} items</span>
+        </div>
+
+        <div className={styles.toolbar}>
+          <div className={styles.filters}>
+            <button 
+              className={`${styles.fBtn} ${statusFilter === 'all' ? styles.on : ''}`}
+              onClick={() => setStatusFilter('all')}
+            >
+              All
+            </button>
+            <button 
+              className={`${styles.fBtn} ${statusFilter === 'available' ? styles.on : ''}`}
+              onClick={() => setStatusFilter('available')}
+            >
+              Available
+            </button>
+            <button 
+              className={`${styles.fBtn} ${statusFilter === 'reserved' ? styles.on : ''}`}
+              onClick={() => setStatusFilter('reserved')}
+            >
+              Reserved
+            </button>
+            <button 
+              className={`${styles.fBtn} ${statusFilter === 'sold' ? styles.on : ''}`}
+              onClick={() => setStatusFilter('sold')}
+            >
+              Sold
+            </button>
+          </div>
+
+          <input 
+            type="text" 
+            placeholder="Search items..." 
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className={styles.searchField}
+          />
+        </div>
+
+        {loading ? (
+          <div className={styles.loadingArea}>
+            <div className={styles.loadingSpinner} />
+            <span>กำลังโหลดสินค้า...</span>
+          </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className={styles.emptyArea}>
+            <i className="ti ti-eye-off" style={{ fontSize: '36px', marginBottom: '8px' }} />
+            <span>ไม่พบสินค้าที่ตรงตามเงื่อนไข</span>
+          </div>
+        ) : (
+          <div className={styles.pgrid}>
+            {filteredProducts.map(p => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* About brand block */}
+      <section className={`${styles.brandBlock} container`} id="brand">
+        <div>
+          <p className={styles.overline}>About</p>
+          <h2 className={styles.brandH}>
+            Sleek.<br />
+            Bold.<br />
+            <span>Authentic.</span>
+          </h2>
+        </div>
+        <div>
+          <div className={styles.trait}>
+            <span className={styles.traitN}>01</span>
+            <p className={styles.traitT}><strong>ของแท้ 100%</strong> — ตรวจสอบก่อนลง stock ทุกชิ้น</p>
+          </div>
+          <div className={styles.trait}>
+            <span className={styles.traitN}>02</span>
+            <p className={styles.traitT}><strong>Real-time stock</strong> — Available, Reserved, Sold อัปเดตทันที</p>
+          </div>
+          <div className={styles.trait}>
+            <span className={styles.traitN}>03</span>
+            <p className={styles.traitT}><strong>Direct purchase</strong> — ซื้อตรงผ่านแชท ไม่มีตัวแทน</p>
+          </div>
+          <div className={styles.trait}>
+            <span className={styles.traitN}>04</span>
+            <p className={styles.traitT}><strong>Order tracking</strong> — ติดตามสถานะ 24 ชม. ด้วยเบอร์โทร</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Chat to Buy CTA section */}
+      <section className="container">
+        <div className={styles.ctaRow} id="cta">
+          <h3 className={styles.ctaH}>
+            <strong>Chat</strong> to buy.<br />
+            Easy & fast.
+          </h3>
+          <div className={styles.ctaBtns}>
+            <a href="https://line.me/ti/p/~YOUR_LINE_ID" target="_blank" rel="noreferrer" className={styles.ctaB1}>
+              LINE
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className={styles.ctaB2}>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
