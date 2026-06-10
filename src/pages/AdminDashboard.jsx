@@ -7,7 +7,7 @@ import { api } from '../../convex/_generated/api'
 
 const EMPTY_FORM = {
   name: '', description: '', price: '', category: 'clothing',
-  image_url: '', status: 'available'
+  image_url: '', status: 'available', is_hot: false
 }
 
 const EMPTY_ORDER_FORM = {
@@ -19,9 +19,9 @@ const EMPTY_REVIEW_FORM = {
 }
 
 const INITIAL_PRODUCTS = [
-  { id: '1', title: 'Vintage Denim Jacket', name: 'Vintage Denim Jacket', description: 'Classic oversized 90s vintage denim jacket.', price: 1200, image_url: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=600&q=80', status: 'available', category: 'clothing' },
-  { id: '2', title: 'Retro Leather Boots', name: 'Retro Leather Boots', description: 'Genuine brown leather boots, Unisex Size 41.', price: 2500, image_url: 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=600&q=80', status: 'reserved', category: 'footwear' },
-  { id: '3', title: 'Analog Film Camera', name: 'Analog Film Camera', description: 'Minolta SLR 35mm film camera. Tested, light meter working.', price: 3400, image_url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80', status: 'sold', category: 'electronics' }
+  { id: '1', title: 'Vintage Denim Jacket', name: 'Vintage Denim Jacket', description: 'Classic oversized 90s vintage denim jacket.', price: 1200, image_url: 'https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=600&q=80', status: 'available', category: 'clothing', is_hot: true },
+  { id: '2', title: 'Retro Leather Boots', name: 'Retro Leather Boots', description: 'Genuine brown leather boots, Unisex Size 41.', price: 2500, image_url: 'https://images.unsplash.com/photo-1520639888713-7851133b1ed0?auto=format&fit=crop&w=600&q=80', status: 'reserved', category: 'footwear', is_hot: false },
+  { id: '3', title: 'Analog Film Camera', name: 'Analog Film Camera', description: 'Minolta SLR 35mm film camera. Tested, light meter working.', price: 3400, image_url: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=600&q=80', status: 'sold', category: 'electronics', is_hot: false }
 ]
 
 const INITIAL_ORDERS = [
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
   const [editing, setEditing] = useState(null)
   const [editingOrder, setEditingOrder] = useState(null)
   const [editingReview, setEditingReview] = useState(null)
-  const [tab, setTab] = useState('products')
+  const [tab, setTab] = useState('dashboard')
   const [loading, setLoading] = useState(false)
   const [usingFallback, setUsingFallback] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -230,6 +230,7 @@ export default function AdminDashboard() {
       category: form.category,
       image_url: form.image_url,
       status: form.status,
+      is_hot: !!form.is_hot,
     }
 
     if (usingFallback) {
@@ -507,7 +508,8 @@ export default function AdminDashboard() {
           category: prod.category,
           image_url: prod.image_url,
           description: prod.description,
-          status
+          status,
+          is_hot: !!prod.is_hot
         })
         toast.success(`เปลี่ยนเป็น: ${status}`)
         fetchAll()
@@ -567,7 +569,8 @@ export default function AdminDashboard() {
       price: p.price,
       category: p.category || 'clothing',
       image_url: p.image_url || '',
-      status: p.status
+      status: p.status,
+      is_hot: !!p.is_hot
     })
     setTab('form')
     window.scrollTo(0, 0)
@@ -646,6 +649,9 @@ export default function AdminDashboard() {
 
         {/* Tabs */}
         <div className={styles.tabs}>
+          <button className={`${styles.tab} ${tab === 'dashboard' ? styles.activeTab : ''}`} onClick={() => setTab('dashboard')}>
+            แผงควบคุม (Dashboard)
+          </button>
           <button className={`${styles.tab} ${tab === 'products' ? styles.activeTab : ''}`} onClick={() => setTab('products')}>
             สินค้า ({products.length})
           </button>
@@ -665,6 +671,37 @@ export default function AdminDashboard() {
             {editingReview ? '✎ แก้ไขรีวิว' : '＋ เพิ่มรีวิว'}
           </button>
         </div>
+
+        {/* Dashboard Analytics View */}
+        {tab === 'dashboard' && (
+          <div className={styles.dashboardGrid}>
+            <div className={styles.statCard}>
+              <div className={styles.statTitle}>รายได้จากการขาย (จัดส่งสำเร็จ)</div>
+              <div className={styles.statValue}>
+                ฿{orders
+                  .filter(o => o.status === 'delivered')
+                  .reduce((sum, o) => sum + Number(o.products?.price || o.product?.price || 0), 0)
+                  .toLocaleString()}
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statTitle}>คำสั่งซื้อทั้งหมด</div>
+              <div className={styles.statValue}>{orders.length} รายการ</div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statTitle}>สินค้าพร้อมขาย</div>
+              <div className={styles.statValue}>
+                {products.filter(p => p.status === 'available').length} ชิ้น
+              </div>
+            </div>
+            <div className={styles.statCard}>
+              <div className={styles.statTitle}>สินค้าขายแล้วทั้งหมด</div>
+              <div className={styles.statValue}>
+                {products.filter(p => p.status === 'sold').length} ชิ้น
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Product Form */}
         {tab === 'form' && (
@@ -726,6 +763,14 @@ export default function AdminDashboard() {
                   onChange={e => setForm({...form, description: e.target.value})}
                   placeholder="สภาพ, ขนาด, รายละเอียดอื่นๆ (ใส่ % สภาพเพื่อจัดอันดับสินค้าได้ เช่น สภาพ 95%)"
                   rows={3} className={styles.input} />
+              </label>
+              <label className={styles.checkboxField}>
+                <input 
+                  type="checkbox" 
+                  checked={!!form.is_hot} 
+                  onChange={e => setForm({...form, is_hot: e.target.checked})} 
+                />
+                <span>ตั้งเป็นสินค้า Hot Item (Spotlight)</span>
               </label>
             </div>
             <div className={styles.formActions}>
@@ -895,7 +940,10 @@ export default function AdminDashboard() {
                           : <div className={styles.noThumb} />
                         }
                       </td>
-                      <td className={styles.tdName}>{p.title || p.name}</td>
+                      <td className={styles.tdName}>
+                        {p.title || p.name}
+                        {p.is_hot && <span className={styles.hotBadge}>HOT</span>}
+                      </td>
                       <td>฿{Number(p.price).toLocaleString()}</td>
                       <td className={styles.tdMuted}>
                         {p.category === 'clothing' ? 'เสื้อผ้า' : p.category === 'footwear' ? 'รองเท้า' : p.category === 'electronics' ? 'อิเล็กทรอนิกส์' : p.category === 'accessories' ? 'เครื่องประดับ' : p.category || '—'}

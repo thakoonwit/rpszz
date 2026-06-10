@@ -110,6 +110,10 @@ export default function Home() {
     return matchStatus && matchSearch
   })
 
+  // Find hot item or fallback
+  const hotProduct = products.find(p => p.is_hot) || products.find(p => p.status === 'available') || products[0]
+  const hotImage = hotProduct?.image_url ? hotProduct.image_url.split(',')[0].trim() : ''
+
   return (
     <div className={styles.page}>
       <Toaster />
@@ -138,12 +142,30 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div className={styles.heroR}>
+        <div 
+          className={styles.heroR} 
+          style={{ cursor: hotProduct ? 'pointer' : 'default' }}
+          onClick={() => {
+            if (hotProduct) {
+              document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })
+            }
+          }}
+        >
           <span className={styles.heroRBg}>RPSZZ</span>
-          <span className={styles.newPill}>New drop</span>
+          <span className={styles.newPill}>{hotProduct?.is_hot ? 'Hot Item' : 'New drop'}</span>
           <div className={styles.heroRInner}>
-            <i className="ti ti-shirt" aria-hidden="true" />
-            <span>hero image</span>
+            {hotImage ? (
+              <img 
+                src={hotImage} 
+                alt={hotProduct?.title || hotProduct?.name} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} 
+              />
+            ) : (
+              <>
+                <i className="ti ti-shirt" aria-hidden="true" />
+                <span>{hotProduct ? (hotProduct.title || hotProduct.name) : 'hero image'}</span>
+              </>
+            )}
           </div>
         </div>
       </section>

@@ -17,6 +17,7 @@ export const add = mutation({
     category: v.optional(v.string()),
     image_url: v.optional(v.string()),
     status: v.string(),
+    is_hot: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("products", args);
@@ -33,6 +34,7 @@ export const update = mutation({
     category: v.optional(v.string()),
     image_url: v.optional(v.string()),
     status: v.string(),
+    is_hot: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const { id, ...data } = args;

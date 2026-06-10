@@ -10,6 +10,7 @@ export default defineSchema({
     category: v.optional(v.string()),
     image_url: v.optional(v.string()),
     status: v.string(), // "available", "reserved", "sold"
+    is_hot: v.optional(v.boolean()),
   }),
   orders: defineTable({
     customer_name: v.string(),
